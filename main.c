@@ -22,7 +22,7 @@ typedef struct {
     unsigned int pitch;         //Note pitch
     unsigned int duration;      //Note duration
     char LED;                   //LEDs to light for each note
-} Note;
+} Note; //40 bits per note, 2.5 bytes
 
 // Function Prototypes
 void swDelay(char numLoops);

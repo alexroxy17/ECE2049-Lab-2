@@ -69,11 +69,11 @@ char getButtons(void)
     if(s1)
         ret |= BIT0;
     if(s2)
-        ret |= BIT2;
+        ret |= BIT1;
     if(s3)
-        ret |= BIT3;
+        ret |= BIT2;
     if(s4)
-        ret |= BIT4;
+        ret |= BIT3;
 
     return ret;
 }
