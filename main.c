@@ -16,7 +16,7 @@
 #define GAMEOVER   53
 #define SHIFTDOWN  54
 #define AFTERCHECK 56
-#define NEXTLEVEL  57
+#define NEXTLEVEL  57 //test
 
 typedef struct {
     unsigned int pitch;         //Note pitch
