@@ -9,14 +9,6 @@
 #include <stdlib.h>
 #include "peripherals.h"
 
-#define WELCOME    50
-#define PRECOUNT   51
-#define COUNTDOWN  52
-#define MAINSTATE  99
-#define GAMEOVER   53
-#define SHIFTDOWN  54
-#define AFTERCHECK 56
-#define NEXTLEVEL  57 //test
 
 typedef struct {
     unsigned int pitch;         //Note pitch
@@ -24,9 +16,15 @@ typedef struct {
     char LED;                   //LEDs to light for each note
 } Note; //40 bits per note, 2.5 bytes
 
+
+//typedef enum {S_MENU, S_COUNTDOWN, S_PLAY, S_LOSE, S_WIN} state;
+typedef enum {WELCOME, PRECOUNT, COUNTDOWN, PLAY, LOSE, WIN} eState;
+
+
 // Function Prototypes
 void swDelay(char numLoops);
 void swDelay2(char numLoops);
+void runTimer(void);
 
 
 
@@ -34,8 +32,6 @@ void swDelay2(char numLoops);
 
 
 volatile unsigned int i,j,k,row,col;    //Global, temporary vars
-volatile unsigned int state = WELCOME;  //Set initial state
-
 
 /******************************MAIN FUNCTION*******************************/
 void main(void)
@@ -48,8 +44,7 @@ void main(void)
     configDisplay();  //Configure 96x96 display
     configKeypad();   //Configure keypad
     initButtons();    //Configure buttons
-
-    /******************************TEMPORARY CODE*******************************/
+    eState state = WELCOME; //Set initial state to welcome
 
 
 
@@ -76,12 +71,11 @@ void main(void)
 
         case PRECOUNT: //Resets a whole lotta variables while the player is prompted to press a button.
         {
-            isDead = 0; //Resets isDead to 0
             volatile unsigned int moveOn = 0;
-
+            char currKey;
             while(moveOn == 0)
             {
-                char currKey = getKey();
+                currKey = getKey();
                 if(currKey == '*')  //Query for star key
                     moveOn = 1;
             }
@@ -92,6 +86,7 @@ void main(void)
         {
             uint8_t* readyText = "Get ready!";         //Using this to avoid CCS complaining at me
             uint8_t* countdown[3] = {"3", "2", "1"};   //Using this to have a loop instead of three seperate write blocks
+            runTimer();
             for(i=0;i<3;i++)
             {
                 Graphics_clearDisplay(&g_sContext); // Clear the display

@@ -75,12 +75,13 @@ char getButtons(void);
 void configureUserLED(char inbits);
 
 void configDisplay(void);
-void BuzzerOn(char pitch);
 void BuzzerOnFreq(int freq);
 void BuzzerOff(void);
 
 void configKeypad(void);
 unsigned char getKey(void);
+
+void runTimer(void);
 
 extern int TI_getRandomIntegerFromADC( void );
 extern int TI_getRandomIntegerFromVLO( void );
