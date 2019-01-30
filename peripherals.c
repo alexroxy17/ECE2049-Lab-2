@@ -171,8 +171,6 @@ void BuzzerOnFreq(int freq)
     TB0CTL  &= ~TBIE;                       // Explicitly Disable timer interrupts for safety
 
     // Now configure the timer period, which controls the PWM period
-    // Doing this with a hard coded values is NOT the best method
-    // We do it here only as an example. You will fix this in Lab 2.
     TB0CCR0   = 32768 / freq;           // Set the PWM period in ACLK ticks
     TB0CCTL0 &= ~CCIE;                  // Disable timer interrupts
 
@@ -183,7 +181,7 @@ void BuzzerOnFreq(int freq)
 }
 
 /*
- * Disable the buzzer on P7.5
+ * Disable the buzzer on P3.5
  */
 void BuzzerOff(void)
 {
