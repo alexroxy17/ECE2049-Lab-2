@@ -305,9 +305,19 @@ void configDisplay(void)
 //Start timer
 void runTimer(void)
 {
+    // From Users Guide Ch 17
+     // Use ACLK (TASSEL_1), clock divider of 1 (ID_0)
+     // and start timer counting in Up mode (MC_1)
+
     TA2CTL = TASSEL_1 + MC_1 + ID_0;
-    TA2CCR0 = 163;
-    TA2CCTL0 = CCIE;
+    TA2CCR0 = 163;      //~1/200 seconds
+    TA2CCTL0 = CCIE;    // TA2CCR0 interrupt enabled
+}
+
+void stopTimer(void)
+{
+    TA2CTL = MC_0;      //Stop timer counting
+    TA2CCTL0 &= ~CCIE;  //TA2CCR0 interrupt disabled
 }
 
 

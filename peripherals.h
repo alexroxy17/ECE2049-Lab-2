@@ -12,6 +12,7 @@
 #include <msp430.h>
 #include <stdint.h>
 #include "grlib.h"
+#include "notes.h"
 
 #include "LcdDriver/Sharp96x96.h"
 #include "LcdDriver/HAL_MSP_EXP430FR5529_Sharp96x96.h"
@@ -82,6 +83,7 @@ void configKeypad(void);
 unsigned char getKey(void);
 
 void runTimer(void);
+void stopTimer(void);
 
 extern int TI_getRandomIntegerFromADC( void );
 extern int TI_getRandomIntegerFromVLO( void );

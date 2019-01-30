@@ -10,12 +10,6 @@
 #include "peripherals.h"
 
 
-typedef struct {
-    unsigned int pitch;         //Note pitch
-    unsigned int duration;      //Note duration
-    char LED;                   //LEDs to light for each note
-} Note; //40 bits per note, 2.5 bytes
-
 
 //typedef enum {S_MENU, S_COUNTDOWN, S_PLAY, S_LOSE, S_WIN} state;
 typedef enum {WELCOME, PRECOUNT, COUNTDOWN, PLAY, LOSE, WIN} eState;
@@ -24,20 +18,94 @@ typedef enum {WELCOME, PRECOUNT, COUNTDOWN, PLAY, LOSE, WIN} eState;
 // Function Prototypes
 void swDelay(char numLoops);
 void swDelay2(char numLoops);
-void runTimer(void);
+void playNote(Note* note);
+void resetGlobals(void);
 
 
+volatile unsigned int count=0, sixteenths=0,note=0,duration,sixteenthsPassed=0;
+#pragma vector=TIMER2_A0_VECTOR
+__interrupt void TimerA2_ISR(void)
+{
+    count++;
+    if (count % 16 == 0)
+        sixteenths++;
+}
 
-/*****************************GLOBALS******************************/
-
-
-volatile unsigned int i,j,k,row,col;    //Global, temporary vars
 
 /******************************MAIN FUNCTION*******************************/
 void main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer. Always need to stop this!!
                                  // You can then configure it properly, if desired
+
+    Note THREEBLINDMICE [] = {
+                              /*  SIXTEEN = 1; EIGHT = 2; FOURTH = 4; HALF = 8; FULL = 16*/
+                              {NOTE_D4,  2, 0},
+                              {NOTE_F4,  2, 0},
+                              {NOTE_D5,  8, 0},
+
+                              {NOTE_D4,  2, 0},
+                              {NOTE_F4,  2, 0},
+                              {NOTE_D5,  8, 0},
+
+                              {NOTE_E5,  6, 0},
+                              {NOTE_F5,  2, 0},
+                              {NOTE_E5,  2, 0},
+                              {NOTE_F5,  2, 0}, //10
+                              //E4 D4 A4
+                              {NOTE_E5,  2, 0},
+                              {NOTE_D5,  2, 0},
+                              {NOTE_A4,  7, 0},
+                              {REST, 1, 0},
+
+                              {NOTE_A4,  4, 0},
+                              {NOTE_D4,  4, 0},
+                              {NOTE_F4,  2, 0},
+                              {NOTE_G4,  2, 0},
+
+                              {NOTE_A4,  9, 0},
+                              {REST, 1, 0},    //20
+
+                              {NOTE_A4,  4, 0},
+                              {NOTE_D4,  4, 0},
+                              {NOTE_F4,  2, 0},
+                              {NOTE_G4,  2, 0},
+
+                              {NOTE_F4,  10, 0},//25
+                              //Midpoint, start over
+                              {NOTE_D4,  2, 0},
+                              {NOTE_F4,  2, 0},
+                              {NOTE_D5,  8, 0},
+
+                              {NOTE_D4,  2, 0},
+                              {NOTE_F4,  2, 0},
+                              {NOTE_D5,  8, 0},
+
+                              {NOTE_E5,  6, 0},
+                              {NOTE_F5,  2, 0},
+                              {NOTE_E5,  2, 0},
+                              {NOTE_F5,  2, 0}, //35
+                              //E4 D4 A4
+                              {NOTE_E5,  2, 0},
+                              {NOTE_D5,  2, 0},
+                              {NOTE_A4,  7, 0},
+                              {REST, 1, 0},
+
+                              {NOTE_A4,  4, 0},
+                              {NOTE_D4,  4, 0},
+                              {NOTE_F4,  2, 0},
+                              {NOTE_G4,  2, 0},
+
+                              {NOTE_A4,  9, 0},
+                              {REST, 1, 0},     //45
+
+                              {NOTE_A4,  4, 0},
+                              {NOTE_D4,  4, 0},
+                              {NOTE_F4,  2, 0},
+                              {NOTE_G4,  2, 0},
+
+                              {NOTE_F4,  10, 0} //50
+    };
 
     //Initialization
     initLeds();       //Initialize LEDs
@@ -46,7 +114,8 @@ void main(void)
     initButtons();    //Configure buttons
     eState state = WELCOME; //Set initial state to welcome
 
-
+    // Using msp430.h definitions
+     _BIS_SR(GIE); // Global Interrupt enable VERY IMPORTANT
 
     /******************************MAIN LOOP*******************************/
     while (1)    // Forever loop
@@ -55,7 +124,7 @@ void main(void)
         {
         case WELCOME: //Dislay welcome screen
         {
-
+            BuzzerOff();
             Graphics_clearDisplay(&g_sContext); // Clear the display
             Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
             Graphics_drawRectangle(&g_sContext, &box);
@@ -87,6 +156,7 @@ void main(void)
             uint8_t* readyText = "Get ready!";         //Using this to avoid CCS complaining at me
             uint8_t* countdown[3] = {"3", "2", "1"};   //Using this to have a loop instead of three seperate write blocks
             runTimer();
+            volatile unsigned int i;
             for(i=0;i<3;i++)
             {
                 Graphics_clearDisplay(&g_sContext); // Clear the display
@@ -98,37 +168,40 @@ void main(void)
                 BuzzerOff();
                 swDelay(7);
             }
-            /*
-            BuzzerOnFreq(440);
-            updateScreen();
-            swDelay(12);
-            BuzzerOff();
-            */
-
-            state = MAINSTATE;
-            break;
-        }
-        case MAINSTATE: //Draw Aliens
-        {
-            break;
-        }//End of maincase
-
-        case NEXTLEVEL:
-        {
-
-            state = MAINSTATE;
+            Graphics_clearDisplay(&g_sContext);
+            sixteenths = 0;
+            state = PLAY;
             break;
         }
 
-        case GAMEOVER:
+        case PLAY:
+        {
+            playNote(&THREEBLINDMICE[note]);
+            volatile unsigned int loc_sixteenths = sixteenths; //sixteenths arises from the global interrupts
+            duration = THREEBLINDMICE[note].duration;
+
+            if(loc_sixteenths - sixteenthsPassed == duration)
+            {
+                note++;
+                sixteenthsPassed = loc_sixteenths;
+                BuzzerOff();
+            }
+            if(note >= 50)
+            {
+                state = LOSE;
+            }
+            break;
+        }
+
+
+        case LOSE:
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
+            BuzzerOff();
 
-            /*/-----------Resetting globals-----------//
-            isDead      = 0;
-            level       = 0;
-            clearLevel  = 0;                         */
             setLeds(0);
+            //RESETTING GLOBALS
+            resetGlobals();
 
             Graphics_drawStringCentered(&g_sContext, "GAME", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "OVER", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
@@ -148,6 +221,25 @@ void main(void)
         }//End switch
     }  // end while (1)
 }//End main
+
+
+
+
+void playNote(Note* note)
+{
+    BuzzerOnFreq(note->pitch);
+}
+
+void resetGlobals(void)
+{
+    note = 0;
+    sixteenthsPassed = 0;
+    sixteenths = 0;
+    count = 0;
+    duration = 0;
+}
+
+
 
 
 void swDelay(char numLoops)
