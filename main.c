@@ -18,6 +18,11 @@
 #define AFTERCHECK 56
 #define NEXTLEVEL  57
 
+typedef struct {
+    unsigned int pitch;         //Note pitch
+    unsigned int duration;      //Note duration
+    char LED;                   //LEDs to light for each note
+} Note;
 
 // Function Prototypes
 void swDelay(char numLoops);
