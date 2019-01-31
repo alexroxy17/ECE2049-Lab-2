@@ -23,7 +23,7 @@ volatile unsigned int count=0, sixteenths=0,note=0,duration,sixteenthsPassed=0;
 __interrupt void TimerA2_ISR(void)
 {
     count++;
-    if (count % 16 == 0)
+    if (count % 8 == 0)
         sixteenths++;
 }
 
@@ -34,7 +34,7 @@ void main(void)
     WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer. Always need to stop this!!
                                  // You can then configure it properly, if desired
 
-    Note SONGOFSTORMS [] = {
+    Note SONGOFSTORMS [] {
                                 /*  SIXTEEN = 1; EIGHT = 2; FOURTH = 4; HALF = 8; FULL = 16*/
                                 /* THIRTYSECOND = 1 SIXTEEN = 2; EIGHT = 4; FOURTH = 8; HALF = 16; FULL = 32*/
                               {NOTE_D4,  EIGHTH, 0},
@@ -52,10 +52,10 @@ void main(void)
                               //E4 D4 A4
                               {NOTE_E5,  EIGHTH, 0},
                               {NOTE_D5,  EIGHTH, 0},
-                              {NOTE_A4,  HALF - 1, 0},
+                              {NOTE_A4,  HALF, 0},
                               {REST, 1, 0},
 
-                              {NOTE_A4,  FOURTH, 0},
+                              //{NOTE_A4,  FOURTH, 0},
                               {NOTE_D4,  FOURTH, 0},
                               {NOTE_F4,  EIGHTH, 0},
                               {NOTE_G4,  EIGHTH, 0},
