@@ -10,7 +10,6 @@
 #define PERIPHERALS_H_
 
 #include <msp430.h>
-#include <stdint.h>
 #include "grlib.h"
 #include "notes.h"
 
@@ -87,9 +86,6 @@ void stopTimer(void);
 
 extern int TI_getRandomIntegerFromADC( void );
 extern int TI_getRandomIntegerFromVLO( void );
-
-extern unsigned int TI_RandomIntegerFromVLO;
-extern unsigned int TI_RandomIntegerFromADC;
 
 
 #endif /* PERIPHERALS_H_ */

@@ -6,12 +6,8 @@
 /***************************************************/
 
 #include <msp430.h>
-#include <stdlib.h>
 #include "peripherals.h"
 
-
-
-//typedef enum {S_MENU, S_COUNTDOWN, S_PLAY, S_LOSE, S_WIN} state;
 typedef enum {WELCOME, PRECOUNT, COUNTDOWN, PLAY, LOSE, WIN} eState;
 
 
@@ -38,7 +34,7 @@ void main(void)
     WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer. Always need to stop this!!
                                  // You can then configure it properly, if desired
 
-    Note THREEBLINDMICE [] = {
+    Note SONGOFSTORMS [] = {
                               /*  SIXTEEN = 1; EIGHT = 2; FOURTH = 4; HALF = 8; FULL = 16*/
                               {NOTE_D4,  2, 0},
                               {NOTE_F4,  2, 0},
@@ -176,9 +172,9 @@ void main(void)
 
         case PLAY:
         {
-            playNote(&THREEBLINDMICE[note]);
+            playNote(&SONGOFSTORMS[note]);
             volatile unsigned int loc_sixteenths = sixteenths; //sixteenths arises from the global interrupts
-            duration = THREEBLINDMICE[note].duration;
+            duration = SONGOFSTORMS[note].duration;
 
             if(loc_sixteenths - sixteenthsPassed == duration)
             {
