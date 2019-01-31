@@ -35,70 +35,71 @@ void main(void)
                                  // You can then configure it properly, if desired
 
     Note SONGOFSTORMS [] = {
-                              /*  SIXTEEN = 1; EIGHT = 2; FOURTH = 4; HALF = 8; FULL = 16*/
-                              {NOTE_D4,  2, 0},
-                              {NOTE_F4,  2, 0},
-                              {NOTE_D5,  8, 0},
+                                /*  SIXTEEN = 1; EIGHT = 2; FOURTH = 4; HALF = 8; FULL = 16*/
+                                /* THIRTYSECOND = 1 SIXTEEN = 2; EIGHT = 4; FOURTH = 8; HALF = 16; FULL = 32*/
+                              {NOTE_D4,  EIGHTH, 0},
+                              {NOTE_F4,  EIGHTH, 0},
+                              {NOTE_D5,  FOURTH, 0},
 
-                              {NOTE_D4,  2, 0},
-                              {NOTE_F4,  2, 0},
-                              {NOTE_D5,  8, 0},
+                              {NOTE_D4,  EIGHTH, 0},
+                              {NOTE_F4,  EIGHTH, 0},
+                              {NOTE_D5,  FOURTH, 0},
 
-                              {NOTE_E5,  6, 0},
-                              {NOTE_F5,  2, 0},
-                              {NOTE_E5,  2, 0},
-                              {NOTE_F5,  2, 0}, //10
+                              {NOTE_E5,  FOURTH + EIGHTH, 0},
+                              {NOTE_F5,  EIGHTH, 0},
+                              {NOTE_E5,  EIGHTH, 0},
+                              {NOTE_F5,  EIGHTH, 0}, //10
                               //E4 D4 A4
-                              {NOTE_E5,  2, 0},
-                              {NOTE_D5,  2, 0},
-                              {NOTE_A4,  7, 0},
+                              {NOTE_E5,  EIGHTH, 0},
+                              {NOTE_D5,  EIGHTH, 0},
+                              {NOTE_A4,  HALF - 1, 0},
                               {REST, 1, 0},
 
-                              {NOTE_A4,  4, 0},
-                              {NOTE_D4,  4, 0},
-                              {NOTE_F4,  2, 0},
-                              {NOTE_G4,  2, 0},
+                              {NOTE_A4,  FOURTH, 0},
+                              {NOTE_D4,  FOURTH, 0},
+                              {NOTE_F4,  EIGHTH, 0},
+                              {NOTE_G4,  EIGHTH, 0},
 
-                              {NOTE_A4,  9, 0},
+                              {NOTE_A4,  HALF + EIGHTH - 1, 0},
                               {REST, 1, 0},    //20
 
-                              {NOTE_A4,  4, 0},
-                              {NOTE_D4,  4, 0},
-                              {NOTE_F4,  2, 0},
-                              {NOTE_G4,  2, 0},
+                              {NOTE_A4,  FOURTH, 0},
+                              {NOTE_D4,  FOURTH, 0},
+                              {NOTE_F4,  EIGHTH, 0},
+                              {NOTE_G4,  EIGHTH, 0},
 
-                              {NOTE_F4,  10, 0},//25
+                              {NOTE_F4,  HALF + EIGHTH, 0},//25
                               //Midpoint, start over
-                              {NOTE_D4,  2, 0},
-                              {NOTE_F4,  2, 0},
-                              {NOTE_D5,  8, 0},
+                              {NOTE_D4,  EIGHTH, 0},
+                              {NOTE_F4,  EIGHTH, 0},
+                              {NOTE_D5,  HALF 0},
 
-                              {NOTE_D4,  2, 0},
-                              {NOTE_F4,  2, 0},
-                              {NOTE_D5,  8, 0},
+                              {NOTE_D4,  EIGHTH, 0},
+                              {NOTE_F4,  EIGHTH, 0},
+                              {NOTE_D5,  HALF 0},
 
-                              {NOTE_E5,  6, 0},
-                              {NOTE_F5,  2, 0},
-                              {NOTE_E5,  2, 0},
-                              {NOTE_F5,  2, 0}, //35
+                              {NOTE_E5,  FOURTH + EIGHTH, 0},
+                              {NOTE_F5,  EIGHTH, 0},
+                              {NOTE_E5,  EIGHTH, 0},
+                              {NOTE_F5,  EIGHTH, 0}, //35
                               //E4 D4 A4
-                              {NOTE_E5,  2, 0},
-                              {NOTE_D5,  2, 0},
-                              {NOTE_A4,  7, 0},
+                              {NOTE_E5,  EIGHTH, 0},
+                              {NOTE_D5,  EIGHTH, 0},
+                              {NOTE_A4,  HALF - 1, 0},
                               {REST, 1, 0},
 
-                              {NOTE_A4,  4, 0},
-                              {NOTE_D4,  4, 0},
-                              {NOTE_F4,  2, 0},
-                              {NOTE_G4,  2, 0},
+                              {NOTE_A4,  FOURTH, 0},
+                              {NOTE_D4,  FOURTH, 0},
+                              {NOTE_F4,  EIGHTH, 0},
+                              {NOTE_G4,  EIGHTH, 0},
 
-                              {NOTE_A4,  9, 0},
+                              {NOTE_A4,  HALF + EIGHTH - 1, 0},
                               {REST, 1, 0},     //45
 
-                              {NOTE_A4,  4, 0},
-                              {NOTE_D4,  4, 0},
-                              {NOTE_F4,  2, 0},
-                              {NOTE_G4,  2, 0},
+                              {NOTE_A4,  FOURTH 0},
+                              {NOTE_D4,  FOURTH 0},
+                              {NOTE_F4,  EIGHTH, 0},
+                              {NOTE_G4,  EIGHTH, 0},
 
                               {NOTE_F4,  10, 0} //50
     };

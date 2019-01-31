@@ -15,10 +15,16 @@ typedef struct {
     char LED;                   //LEDs to light for each note
 } Note; //40 bits per note, 2.5 bytes
 
+//Note Lengths
+#define THSCND 1
+#define SXTNTH 2
+#define EIGHTH 4
+#define FOURTH 8
+#define HALF   16
+#define FULL   32
 
-#define REST    1
-
-
+//Note Pitches
+#define REST     1
 #define NOTE_C3  131
 #define NOTE_Cs3 139
 #define NOTE_D3  147
