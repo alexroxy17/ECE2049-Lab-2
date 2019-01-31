@@ -268,7 +268,7 @@ void main(void)
                 sixteenthsPassed = loc_sixteenths;
                 BuzzerOff();
             }
-            if(note >= 122)
+            if(note >= 119) //Replace with Song.noteCount later
             {
                 state = LOSE;
             }
