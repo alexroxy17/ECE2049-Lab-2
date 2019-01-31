@@ -8,7 +8,7 @@
 #include <msp430.h>
 #include "peripherals.h"
 
-typedef enum {WELCOME, PRECOUNT, COUNTDOWN, PLAY, LOSE, WIN} eState;
+typedef enum {WELCOME,COUNTDOWN, PLAY, LOSE, WIN} eState;
 
 
 // Function Prototypes
@@ -130,21 +130,18 @@ void main(void)
             Graphics_drawStringCentered(&g_sContext, "Press * to", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "start", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);                                                                         //Refreshing screen
-            state = PRECOUNT; //Wait for input
-            break;
-        }
 
-        case PRECOUNT: //Resets a whole lotta variables while the player is prompted to press a button.
-        {
-            volatile unsigned int moveOn = 0;
-            char currKey;
+            volatile unsigned int moveOn = 0;   //Wait flag
+            char currKey;                       //Holds current key
             while(moveOn == 0)
             {
                 currKey = getKey();
-                if(currKey == '*')  //Query for star key
+                if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     moveOn = 1;
             }
             state = COUNTDOWN;
+
+            break;
         }
 
         case COUNTDOWN: //Countdown from 3 to 1, with ~1 second interval
@@ -193,11 +190,9 @@ void main(void)
         case LOSE:
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
-            BuzzerOff();
-
-            setLeds(0);
-            //RESETTING GLOBALS
-            resetGlobals();
+            BuzzerOff();    //Reset buzzer
+            setLeds(0);     //Reset LEDs
+            resetGlobals(); //Reset globals
 
             Graphics_drawStringCentered(&g_sContext, "GAME", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "OVER", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
