@@ -15,15 +15,16 @@ typedef enum {WELCOME,COUNTDOWN, PLAY, LOSE, WIN} eState;
 void swDelay(char numLoops);
 void swDelay2(char numLoops);
 void playNote(Note* note);
+void playNoteTwo(Note* note);
 void resetGlobals(void);
 
 
-volatile unsigned int count=0, sixteenths=0,note=0,duration,sixteenthsPassed=0;
+volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0;
 #pragma vector=TIMER2_A0_VECTOR
 __interrupt void TimerA2_ISR(void)
 {
     count++;
-    if (count % 16 == 0)
+    if (count % 20 == 0)
         sixteenths++;
 }
 
@@ -33,6 +34,66 @@ void main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer. Always need to stop this!!
                                  // You can then configure it properly, if desired
+    Note GAMEOFTHRONES[] = {
+
+                            {NOTE_G4, 4, 0}, //Patt1
+                            {NOTE_C4, 4, 0},
+                            {NOTE_Ds4, 2, 0},
+                            {NOTE_F4, 2, 0},
+
+                            {NOTE_G4, 4, 0}, //Patt1
+                            {NOTE_C4, 4, 0},
+                            {NOTE_Ds4, 2, 0},
+                            {NOTE_F4, 2, 0},
+
+                            {NOTE_G4, 4, 0}, //Patt 1
+                            {NOTE_C4, 4, 0},
+                            {NOTE_Ds4, 2, 0},
+                            {NOTE_F4, 2, 0},
+
+                            {NOTE_G4, 4, 0}, //Patt 1
+                            {NOTE_C4, 4, 0},
+                            {NOTE_Ds4, 2, 0},
+                            {NOTE_F4, 2, 0},
+
+                            {NOTE_G4, 4, 0}, //Patt 2
+                            {NOTE_C4, 4, 0},
+                            {NOTE_E4, 2, 0},
+                            {NOTE_F4, 2, 0},
+
+                            {NOTE_G4, 4, 0}, //Patt 2
+                            {NOTE_C4, 4, 0},
+                            {NOTE_E4, 2, 0},
+                            {NOTE_F4, 2, 0},
+
+                            {NOTE_G4, 4, 0}, //Patt 2
+                            {NOTE_C4, 4, 0},
+                            {NOTE_E4, 2, 0},
+                            {NOTE_F4, 2, 0},
+
+                            {NOTE_G4, 4, 0}, //Patt 2
+                            {NOTE_C4, 4, 0},
+                            {NOTE_E4, 2, 0},
+                            {NOTE_F4, 2, 0},
+
+                            {NOTE_G4, 12, 0},
+                            {NOTE_C4, 12, 0},
+
+                            {NOTE_C4, 1, 0},
+                            {NOTE_E4, 2, 0},
+                            {NOTE_F4, 2, 0},
+                            {NOTE_G4, 8, 0},
+
+                            {NOTE_C4, 8, 0},
+                            {NOTE_E4, 2, 0},
+                            {NOTE_F4, 2, 0},
+
+                            {NOTE_B3, 4, 0},
+                            {NOTE_D4, 4, 0},
+                            {NOTE_G3, 4, 0},
+                            {NOTE_B3, 2, 0},
+                            {NOTE_C4, 2, 0},
+    };
 
     Note SONGOFSTORMS [] = {
                               /*  SIXTEEN = 1; EIGHT = 2; FOURTH = 4; HALF = 8; FULL = 16*/
@@ -189,14 +250,15 @@ void main(void)
                               {REST, 1, 0},
                               {NOTE_A5, 3, 0},
                               {REST, 1, 0},
-                              {NOTE_A5, 16, 0} //119
+                              {NOTE_A4, 10, 0}, //119
+                              {NOTE_E5, 12, 0}
     };
 
     //Initialization
     initLeds();       //Initialize LEDs
     configDisplay();  //Configure 96x96 display
     configKeypad();   //Configure keypad
-    initButtons();    //Configure buttons
+    //initButtons();    //Configure buttons
     eState state = WELCOME; //Set initial state to welcome
 
     // Using msp430.h definitions
@@ -209,7 +271,7 @@ void main(void)
         {
         case WELCOME: //Dislay welcome screen
         {
-            BuzzerOff();
+            BuzzerOffTwo();
             Graphics_clearDisplay(&g_sContext); // Clear the display
             Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
             Graphics_drawRectangle(&g_sContext, &box);
@@ -258,17 +320,28 @@ void main(void)
 
         case PLAY:
         {
-            playNote(&SONGOFSTORMS[note]);
-            volatile unsigned int loc_sixteenths = sixteenths; //sixteenths arises from the global interrupts
-            duration = SONGOFSTORMS[note].duration;
+            playNote(&SONGOFSTORMS[noteOne]);
+            //playNoteTwo(&GAMEOFTHRONES[noteTwo]);
 
-            if(loc_sixteenths - sixteenthsPassed == duration)
+            volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
+            durationOne = SONGOFSTORMS[noteOne].duration;
+            durationTwo = GAMEOFTHRONES[noteTwo].duration;
+
+            if(loc_sixteenths - sixteenthsPassed == durationOne)
             {
-                note++;
+                noteOne++;
                 sixteenthsPassed = loc_sixteenths;
                 BuzzerOff();
             }
-            if(note >= 119) //Replace with Song.noteCount later
+
+            if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
+            {
+                noteTwo++;
+                sixteenthsPassedTwo = loc_sixteenths_two;
+                BuzzerOffTwo();
+            }
+                          //GOT: 46 SOS: 119
+            if(noteOne >= 165) //Replace with Song.noteCount later
             {
                 state = LOSE;
             }
@@ -279,7 +352,7 @@ void main(void)
         case LOSE:
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
-            BuzzerOff();    //Reset buzzer
+            BuzzerOffTwo();    //Reset buzzer
             setLeds(0);     //Reset LEDs
             resetGlobals(); //Reset globals
 
@@ -303,20 +376,24 @@ void main(void)
 }//End main
 
 
-
-
 void playNote(Note* note)
 {
     BuzzerOnFreq(note->pitch);
 }
 
+void playNoteTwo(Note* note)
+{
+    BuzzerOnFreqTwo(note->pitch);
+}
+
 void resetGlobals(void)
 {
-    note = 0;
+    noteOne = 0;
     sixteenthsPassed = 0;
     sixteenths = 0;
     count = 0;
-    duration = 0;
+    durationOne = 0;
+    durationTwo = 0;
 }
 
 

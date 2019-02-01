@@ -39,19 +39,19 @@ void initButtons(void)
 {
     P7SEL &= ~(BIT0|BIT4);
     P2SEL &= ~(BIT2);
-    P2SEL &= ~(BIT6);       //Selecting buttons for I/O
+    P3SEL &= ~(BIT6);       //Selecting buttons for I/O
 
     P7DIR &= ~(BIT0|BIT4);
     P2DIR &= ~(BIT2);
-    P2DIR &= ~(BIT6);       //Selecting buttons for INPUT (0)
+    P3DIR &= ~(BIT6);       //Selecting buttons for INPUT (0)
 
     P7REN |=  (BIT0|BIT4);
     P2REN |=  (BIT2);
-    P2REN |=  (BIT6);       //Enabling pull resistors
+    P3REN |=  (BIT6);       //Enabling pull resistors
 
     P7OUT |=  (BIT0|BIT4);
     P2OUT |=  (BIT2);
-    P2OUT |=  (BIT6);       //Setting pull resistors to pull UP
+    P3OUT |=  (BIT6);       //Setting pull resistors to pull UP
 
 }
 
@@ -62,7 +62,7 @@ char getButtons(void)
     char s1,s2,s3,s4,ret=0;
 
     s1 = ~(P7IN & BIT0);    //s1 is 1 if P7.0 is 0
-    s2 = ~(P3IN & BIT1);    //button is pressed if value is zero!
+    s2 = ~(P3IN & BIT6);    //button is pressed if value is zero!
     s3 = ~(P2IN & BIT2);
     s4 = ~(P7IN & BIT4);
 
@@ -180,6 +180,25 @@ void BuzzerOnFreq(int freq)
     TB0CCR5   = TB0CCR0/2;                  // Configure a 50% duty cycle
 }
 
+void BuzzerOnFreqTwo(int freq)
+{
+    // Initialize PWM output on P3.5, which corresponds to TB0.5
+    P3SEL |= BIT6; // Select peripheral output mode for P3.5
+    P3DIR |= BIT6;
+
+    TB0CTL  = (TBSSEL__ACLK|ID__1|MC__UP);  // Configure Timer B0 to use ACLK, divide by 1, up mode
+    TB0CTL  &= ~TBIE;                       // Explicitly Disable timer interrupts for safety
+
+    // Now configure the timer period, which controls the PWM period
+    TB0CCR0   = 32768 / freq;           // Set the PWM period in ACLK ticks
+    TB0CCTL0 &= ~CCIE;                  // Disable timer interrupts
+
+    // Configure CC register 5, which is connected to our PWM pin TB0.5
+    TB0CCTL6  = OUTMOD_7;                   // Set/reset mode for PWM
+    TB0CCTL6 &= ~CCIE;                      // Disable capture/compare interrupts
+    TB0CCR6   = TB0CCR0/2;                  // Configure a 50% duty cycle
+}
+
 /*
  * Disable the buzzer on P3.5
  */
@@ -188,6 +207,12 @@ void BuzzerOff(void)
     // Disable both capture/compare periods
     TB0CCTL0 = 0;
     TB0CCTL5 = 0;
+}
+
+void BuzzerOffTwo(void)
+{
+    TB0CCTL0 = 0;
+    TB0CCTL6 = 0;
 }
 
 
