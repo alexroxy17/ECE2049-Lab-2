@@ -222,34 +222,25 @@ void configKeypad(void)
 {
     // Configure digital IO for keypad
     // smj -- 27 Dec 2015
+    //
+    // Optimized/reduced:
+    // nsb -- 01 Feb 2019
 
-    // Col1 = P1.5 =
-    // Col2 = P2.4 =
-    // Col3 = P2.5 =
-    // Row1 = P4.3 =
-    // Row2 = P1.2 =
-    // Row3 = P1.3 =
-    // Row4 = P1.4 =
-
-    P1SEL &= ~(BIT5|BIT4|BIT3|BIT2);
-    P2SEL &= ~(BIT5|BIT4);
-    P4SEL &= ~(BIT3);
+    P1SEL &= ~(BIT5|BIT4); //P1.4, 1.5 for I/0
+    P2SEL &= ~(BIT5);      //P2.5 for I/O
 
     P1DS  &= ~BIT2; //Reset P1 drive strength
 
-    // Columns are ??
-    P2DIR |= (BIT5|BIT4);
-    P1DIR |= BIT5;
-    P2OUT |= (BIT5|BIT4); //
-    P1OUT |= BIT5;        //
+    // Setting up columns
+    P2DIR |= BIT5; //P2.5 Output
+    P1DIR |= BIT5; //P1.5 Output
+    P2OUT |= BIT5; //P2.5 High
+    P1OUT |= BIT5; //P1.5 High
 
-    // Rows are ??
-    P1DIR &= ~(BIT2|BIT3|BIT4);
-    P4DIR &= ~(BIT3);
-    P4REN |= (BIT3);  //
-    P1REN |= (BIT2|BIT3|BIT4);
-    P4OUT |= (BIT3);  //
-    P1OUT |= (BIT2|BIT3|BIT4);
+    // Setting up rows
+    P1DIR &= ~BIT4; //Row 1.4 input
+    P1REN |=  BIT4; //Row 1.4 REN
+    P1OUT |=  BIT4; //Row 1.4 Pullup
 }
 
 
@@ -259,12 +250,13 @@ unsigned char getKey(void)
     // Does not decode or detect when multiple keys pressed.
     // smj -- 27 Dec 2015
     // Updated -- 14 Jan 2018
+    // Updated for MSP430 Hero -- nsb -- 01 Feb 2019
 
     unsigned char ret_val = 0;
 
     // Set Col1 = ?, Col2 = ? and Col3 = ?
     P1OUT &= ~BIT5;
-    P2OUT |= (BIT5|BIT4);
+    P2OUT |=  BIT5;
     if ((P1IN & BIT4)==0)
         ret_val = '*';
     P1OUT |= BIT5;
