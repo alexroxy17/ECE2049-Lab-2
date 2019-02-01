@@ -7,6 +7,8 @@
 
 #include <msp430.h>
 #include "peripherals.h"
+#include "songs.h"
+
 
 typedef enum {WELCOME,COUNTDOWN, PLAY, LOSE, WIN} eState;
 
@@ -94,6 +96,12 @@ void main(void)
                 swDelay(7);
             }
             Graphics_clearDisplay(&g_sContext);
+
+            Graphics_drawStringCentered(&g_sContext, "Press # to", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "exit", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
+            Graphics_flushBuffer(&g_sContext);
+
+
             sixteenths = 0;
             state = PLAY;
             break;
@@ -101,8 +109,8 @@ void main(void)
 
         case PLAY:
         {
+            playNote(&SONGOFSTORMS[noteOne]);
             playNoteTwo(&SONGOFSTORMS[noteOne]);
-            //playNoteTwo(&GAMEOFTHRONES[noteTwo]);
 
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
             durationOne = SONGOFSTORMS[noteOne].duration;
@@ -112,6 +120,7 @@ void main(void)
             {
                 noteOne++;
                 sixteenthsPassed = loc_sixteenths;
+                BuzzerOff();
                 BuzzerOffTwo();
             }
 
@@ -120,12 +129,28 @@ void main(void)
                 noteTwo++;
                 sixteenthsPassedTwo = loc_sixteenths_two;
                 BuzzerOffTwo();
+                BuzzerOff();
             }
-                          //GOT: 46 SOS: 119
+                         //GOT: 46 SOS: 119
             if(noteOne >= 165) //Replace with Song.noteCount later
             {
                 state = LOSE;
             }
+
+            if(noteTwo >= 46)
+            {
+                //BuzzerOffTwo();
+            }
+
+
+            if(getKey() == '#')  //Query for star key, WAIT FOR INPUT
+            {
+                state = LOSE;
+                break;
+            }
+
+
+
             break;
         }
 
@@ -133,6 +158,7 @@ void main(void)
         case LOSE:
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
+            BuzzerOff();
             BuzzerOffTwo();    //Reset buzzer
             setLeds(0);     //Reset LEDs
             resetGlobals(); //Reset globals

@@ -5,9 +5,10 @@
  *      Author: Nathaniel Bajakian
  */
 
-#include "notes.h"
+
 #ifndef SONGOFSTORMS_H_
 #define SONGOFSTORMS_H_
+#include "notes.h"
 
 Note SONGOFSTORMS [] = {
     /*  SIXTEEN = 1; EIGHT = 2; FOURTH = 4; HALF = 8; FULL = 16*/

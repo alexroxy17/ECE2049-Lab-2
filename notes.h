@@ -9,6 +9,7 @@
 #define NOTES_H_
 
 
+
 typedef struct {
     unsigned int pitch;         //Note pitch
     unsigned int duration;      //Note duration

@@ -163,6 +163,7 @@ void setLeds(unsigned char state)
 
 void BuzzerOnFreq(int freq)
 {
+    freq /= 2;
     // Initialize PWM output on P3.5, which corresponds to TB0.5
     P3SEL |= BIT5; // Select peripheral output mode for P3.5
     P3DIR |= BIT5;
@@ -182,22 +183,22 @@ void BuzzerOnFreq(int freq)
 
 void BuzzerOnFreqTwo(int freq)
 {
-    // Initialize PWM output on P3.5, which corresponds to TB0.5
-    P3SEL |= BIT6; // Select peripheral output mode for P3.5
-    P3DIR |= BIT6;
-    P3DS  |= BIT6; //High drive strength
+    // Initialize PWM output on P1.2, which corresponds to TA0.1
+    P1SEL |= BIT2; // Select peripheral output mode for P1.2
+    P1DIR |= BIT2;
+    //P1DS  |= BIT2; //High drive strength
 
-    TB0CTL  = (TBSSEL__ACLK|ID__1|MC__UP);  // Configure Timer B0 to use ACLK, divide by 1, up mode
-    TB0CTL  &= ~TBIE;                       // Explicitly Disable timer interrupts for safety
+    TA0CTL  = (TASSEL__ACLK|ID__1|MC__UP);  // Configure Timer B0 to use ACLK, divide by 1, up mode
+    TA0CTL  &= ~TBIE;                       // Explicitly Disable timer interrupts for safety
 
     // Now configure the timer period, which controls the PWM period
-    TB0CCR0   = 32768 / freq;           // Set the PWM period in ACLK ticks
-    TB0CCTL0 &= ~CCIE;                  // Disable timer interrupts
+    TA0CCR0   = 32768 / freq;           // Set the PWM period in ACLK ticks
+    TA0CCTL0 &= ~CCIE;                  // Disable timer interrupts
 
     // Configure CC register 5, which is connected to our PWM pin TB0.5
-    TB0CCTL6  = OUTMOD_7;                   // Set/reset mode for PWM
-    TB0CCTL6 &= ~CCIE;                      // Disable capture/compare interrupts
-    TB0CCR6   = TB0CCR0/2;                  // Configure a 50% duty cycle
+    TA0CCTL1  = OUTMOD_7;                   // Set/reset mode for PWM
+    TA0CCTL1 &= ~CCIE;                      // Disable capture/compare interrupts
+    TA0CCR1   = TA0CCR0/2;                  // Configure a 50% duty cycle
 }
 
 /*
@@ -212,8 +213,8 @@ void BuzzerOff(void)
 
 void BuzzerOffTwo(void)
 {
-    TB0CCTL0 = 0;
-    TB0CCTL6 = 0;
+    TA0CCTL0 = 0;
+    TA0CCTL1 = 0;
 }
 
 
@@ -233,6 +234,8 @@ void configKeypad(void)
     P1SEL &= ~(BIT5|BIT4|BIT3|BIT2);
     P2SEL &= ~(BIT5|BIT4);
     P4SEL &= ~(BIT3);
+
+    P1DS  &= ~BIT2; //Reset P1 drive strength
 
     // Columns are ??
     P2DIR |= (BIT5|BIT4);
@@ -262,39 +265,12 @@ unsigned char getKey(void)
     // Set Col1 = ?, Col2 = ? and Col3 = ?
     P1OUT &= ~BIT5;
     P2OUT |= (BIT5|BIT4);
-    // Now check value from each rows
-    if ((P4IN & BIT3)==0)
-        ret_val = '1';
-    if ((P1IN & BIT2)==0)
-        ret_val = '4';
-    if ((P1IN & BIT3)==0)
-        ret_val = '7';
     if ((P1IN & BIT4)==0)
         ret_val = '*';
     P1OUT |= BIT5;
 
     // Set Col1 = ?, Col2 = ? and Col3 = ?
-    P2OUT &= ~BIT4;
-    // Now check value from each rows
-    if ((P4IN & BIT3)==0)
-        ret_val = '2';
-    if ((P1IN & BIT2)==0)
-        ret_val = '5';
-    if ((P1IN & BIT3)==0)
-        ret_val = '8';
-    if ((P1IN & BIT4)==0)
-        ret_val = '0';
-    P2OUT |= BIT4;
-
-    // Set Col1 = ?, Col2 = ? and Col3 = ?
     P2OUT &= ~BIT5;
-    // Now check value from each rows
-    if ((P4IN & BIT3)==0)
-        ret_val = '3';
-    if ((P1IN & BIT2)==0)
-        ret_val = '6';
-    if ((P1IN & BIT3)==0)
-        ret_val = '9';
     if ((P1IN & BIT4)==0)
         ret_val = '#';
     P2OUT |= BIT5;
