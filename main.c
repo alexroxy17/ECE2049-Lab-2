@@ -24,7 +24,7 @@ volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,dura
 __interrupt void TimerA2_ISR(void)
 {
     count++;
-    if (count % 20 == 0)
+    if (count % 18 == 0) //165 bpm
         sixteenths++;
 }
 
@@ -320,7 +320,7 @@ void main(void)
 
         case PLAY:
         {
-            playNote(&SONGOFSTORMS[noteOne]);
+            playNoteTwo(&SONGOFSTORMS[noteOne]);
             //playNoteTwo(&GAMEOFTHRONES[noteTwo]);
 
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
@@ -331,7 +331,7 @@ void main(void)
             {
                 noteOne++;
                 sixteenthsPassed = loc_sixteenths;
-                BuzzerOff();
+                BuzzerOffTwo();
             }
 
             if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
