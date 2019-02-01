@@ -185,6 +185,7 @@ void BuzzerOnFreqTwo(int freq)
     // Initialize PWM output on P3.5, which corresponds to TB0.5
     P3SEL |= BIT6; // Select peripheral output mode for P3.5
     P3DIR |= BIT6;
+    P3DS  |= BIT6; //High drive strength
 
     TB0CTL  = (TBSSEL__ACLK|ID__1|MC__UP);  // Configure Timer B0 to use ACLK, divide by 1, up mode
     TB0CTL  &= ~TBIE;                       // Explicitly Disable timer interrupts for safety
