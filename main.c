@@ -142,14 +142,8 @@ void main(void)
                 //BuzzerOffTwo();
             }
 
-
-            if(getKey() == '#')  //Query for star key, WAIT FOR INPUT
-            {
+            if(getKey() == '#')
                 state = LOSE;
-                break;
-            }
-
-
 
             break;
         }
@@ -158,11 +152,11 @@ void main(void)
         case LOSE:
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
-            BuzzerOff();
-            BuzzerOffTwo();    //Reset buzzer
+            BuzzerOff();    //Reset buzzers
+            BuzzerOffTwo(); //Reset buzzers
             setLeds(0);     //Reset LEDs
             resetGlobals(); //Reset globals
-
+            stopTimer();    //Stop  timer
             Graphics_drawStringCentered(&g_sContext, "GAME", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "OVER", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "To return:", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
