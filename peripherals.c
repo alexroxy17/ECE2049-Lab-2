@@ -163,7 +163,7 @@ void setLeds(unsigned char state)
 
 void BuzzerOnFreq(int freq)
 {
-    freq /= 2;
+    //freq /= 2;
     // Initialize PWM output on P3.5, which corresponds to TB0.5
     P3SEL |= BIT5; // Select peripheral output mode for P3.5
     P3DIR |= BIT5;
@@ -186,7 +186,7 @@ void BuzzerOnFreqTwo(int freq)
     // Initialize PWM output on P1.2, which corresponds to TA0.1
     P1SEL |= BIT2; // Select peripheral output mode for P1.2
     P1DIR |= BIT2;
-    //P1DS  |= BIT2; //High drive strength
+    P1DS  |= BIT2; //High drive strength
 
     TA0CTL  = (TASSEL__ACLK|ID__1|MC__UP);  // Configure Timer B0 to use ACLK, divide by 1, up mode
     TA0CTL  &= ~TBIE;                       // Explicitly Disable timer interrupts for safety

@@ -110,7 +110,7 @@ void main(void)
         case PLAY:
         {
             playNote(&SONGOFSTORMS[noteOne]);
-            playNoteTwo(&SONGOFSTORMS[noteOne]);
+            playNoteTwo(&GAMEOFTHRONES[noteTwo]);
 
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
             durationOne = SONGOFSTORMS[noteOne].duration;
@@ -132,7 +132,7 @@ void main(void)
                 BuzzerOff();
             }
                          //GOT: 46 SOS: 119
-            if(noteOne >= 165) //Replace with Song.noteCount later
+            if(noteOne >= 46) //Replace with Song.noteCount later
             {
                 state = LOSE;
             }
