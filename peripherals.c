@@ -222,7 +222,6 @@ void configKeypad(void)
 {
     // Configure digital IO for keypad
     // smj -- 27 Dec 2015
-    //
     // Optimized/reduced:
     // nsb -- 01 Feb 2019
 
