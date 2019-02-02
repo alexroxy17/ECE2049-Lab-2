@@ -47,6 +47,7 @@ typedef struct {
 #define NOTE_A3  220
 #define NOTE_As3 233
 #define NOTE_B3  247
+#define NOTE_Bs3 262
 #define NOTE_C4  262
 #define NOTE_Cs4 277
 #define NOTE_Db4 277

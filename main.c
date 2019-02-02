@@ -111,10 +111,15 @@ void main(void)
 
         case PLAY:
         {
+
+            //playNoteTwo(&takeMeHomeTreble[noteOne]);
+            //playNote(&takeMeHomeBass[noteTwo]);
             playNoteTwo(&gravityFallsBass[noteOne]);
             playNote(&gravityFallsTreble[noteTwo]);
 
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
+            //durationOne = takeMeHomeTreble[noteOne].duration;
+            //durationTwo = takeMeHomeBass[noteTwo].duration;
             durationOne = gravityFallsBass[noteOne].duration;
             durationTwo = gravityFallsTreble[noteTwo].duration;
 
@@ -134,7 +139,7 @@ void main(void)
             }
 
 
-                         //GOT: 46 SOS: 119
+                         //GOT: 46 SOS: 119  GF: 184/75  TMH: 181/54
             if(noteOne >= 184) //Replace with Song.noteCount later
                 state = LOSE;
 
