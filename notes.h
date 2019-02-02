@@ -26,10 +26,19 @@ typedef struct {
 
 //Note Pitches
 #define REST     1
+
+#define NOTE_C2  65
+#define NOTE_D2  73
+#define NOTE_E2  84
+#define NOTE_F2  87
+#define NOTE_G2  98
+#define NOTE_A2  110
+#define NOTE_B2  123
 #define NOTE_C3  131
 #define NOTE_Cs3 139
 #define NOTE_D3  147
 #define NOTE_Ds3 156
+#define NOTE_Eb3 156
 #define NOTE_E3  165
 #define NOTE_F3  175
 #define NOTE_Fs3 185
@@ -40,6 +49,7 @@ typedef struct {
 #define NOTE_B3  247
 #define NOTE_C4  262
 #define NOTE_Cs4 277
+#define NOTE_Db4 277
 #define NOTE_D4  294
 #define NOTE_Ds4 311
 #define NOTE_E4  330
@@ -63,6 +73,7 @@ typedef struct {
 #define NOTE_A5  880
 
 #define NOTE_As5 932
+#define NOTE_Bb5 932
 #define NOTE_B5  988
 #define NOTE_C6  1047
 #define NOTE_Cs6 1109

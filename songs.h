@@ -12,6 +12,7 @@
 #include "notes.h"
 #include "songofstorms.h"
 #include "gameofthrones.h"
+#include "gravityfalls.h"
 
 
 #endif /* SONGS_H_ */

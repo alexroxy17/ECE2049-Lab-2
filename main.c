@@ -54,6 +54,8 @@ void main(void)
         {
         case WELCOME: //Dislay welcome screen
         {
+            resetGlobals();
+            BuzzerOff();
             BuzzerOffTwo();
             Graphics_clearDisplay(&g_sContext); // Clear the display
             Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
@@ -102,25 +104,25 @@ void main(void)
             Graphics_flushBuffer(&g_sContext);
 
 
-            sixteenths = 0;
+            resetGlobals();
             state = PLAY;
             break;
         }
 
         case PLAY:
         {
-            playNote(&SONGOFSTORMS[noteOne]);
-            playNoteTwo(&GAMEOFTHRONES[noteTwo]);
+            playNoteTwo(&gravityFallsBass[noteOne]);
+            playNote(&gravityFallsTreble[noteTwo]);
 
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
-            durationOne = SONGOFSTORMS[noteOne].duration;
-            durationTwo = GAMEOFTHRONES[noteTwo].duration;
+            durationOne = gravityFallsBass[noteOne].duration;
+            durationTwo = gravityFallsTreble[noteTwo].duration;
 
             if(loc_sixteenths - sixteenthsPassed == durationOne)
             {
                 noteOne++;
                 sixteenthsPassed = loc_sixteenths;
-                BuzzerOff();
+                //BuzzerOff();
                 BuzzerOffTwo();
             }
 
@@ -128,19 +130,16 @@ void main(void)
             {
                 noteTwo++;
                 sixteenthsPassedTwo = loc_sixteenths_two;
-                BuzzerOffTwo();
                 BuzzerOff();
             }
-                         //GOT: 46 SOS: 119
-            if(noteOne >= 46) //Replace with Song.noteCount later
-            {
-                state = LOSE;
-            }
 
-            if(noteTwo >= 46)
-            {
-                //BuzzerOffTwo();
-            }
+
+                         //GOT: 46 SOS: 119
+            if(noteOne >= 184) //Replace with Song.noteCount later
+                state = LOSE;
+
+            if(noteTwo >= 75)
+                BuzzerOff();
 
             if(getKey() == '#')
                 state = LOSE;
@@ -190,7 +189,10 @@ void playNoteTwo(Note* note)
 void resetGlobals(void)
 {
     noteOne = 0;
+    noteTwo = 0;
     sixteenthsPassed = 0;
+    sixteenthsPassedTwo = 0;
+    sixteenths = 0;
     sixteenths = 0;
     count = 0;
     durationOne = 0;
