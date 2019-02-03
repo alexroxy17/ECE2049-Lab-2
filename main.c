@@ -141,9 +141,9 @@ void main(void)
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
 
             playNoteTwo(&songList[song].bigSpeaker[noteOne], songList[song].power);
-            playNote(&songList[song].littleSpeaker[noteTwo]);
+            playNote   (&songList[song].smlSpeaker[noteTwo]);
             durationOne = songList[song].bigSpeaker[noteOne].duration;
-            durationTwo = songList[song].littleSpeaker[noteTwo].duration;
+            durationTwo = songList[song].smlSpeaker[noteTwo].duration;
 
             if(loc_sixteenths - sixteenthsPassed == durationOne)
             {
@@ -163,83 +163,6 @@ void main(void)
                 state = LOSE;
             if(getKey() == '#')
                 state = LOSE;
-
-            /*
-            if(song == 0)
-            {
-                playNoteTwo(&gravityFallsBass[noteOne], 1);
-                playNote(&gravityFallsTreble[noteTwo]);
-                durationOne = gravityFallsBass[noteOne].duration;
-                durationTwo = gravityFallsTreble[noteTwo].duration;
-
-                if(loc_sixteenths - sixteenthsPassed == durationOne)
-                {
-                    noteOne++;
-                    sixteenthsPassed = loc_sixteenths;
-                    BuzzerOffTwo();
-                }
-
-                if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
-                {
-                    noteTwo++;
-                    sixteenthsPassedTwo = loc_sixteenths_two;
-                    BuzzerOff();
-                }
-                             //GOT: 46 SOS: 119  GF: 184/75  TMH: 181/54    TET: 311/352
-                if(noteOne >= 184) //Replace with Song.noteCount later
-                    BuzzerOffTwo();
-                if(noteTwo >= 75)  //Tet:Tre
-                    state = LOSE;
-                if(getKey() == '#')
-                    state = LOSE;
-            }
-            if(song == 1)
-            {
-                playNoteTwo(&tetrisBass[noteOne], 1);
-                playNote(&tetrisTreble[noteTwo]);
-                durationOne = tetrisBass[noteOne].duration;
-                durationTwo = tetrisTreble[noteTwo].duration;
-
-                if(loc_sixteenths - sixteenthsPassed == durationOne)
-                {
-                    noteOne++;
-                    sixteenthsPassed = loc_sixteenths;
-                    BuzzerOffTwo();
-                }
-
-                if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
-                {
-                    noteTwo++;
-                    sixteenthsPassedTwo = loc_sixteenths_two;
-                    BuzzerOff();
-                }
-                             //GOT: 46 SOS: 119  GF: 184/75  TMH: 181/54    TET: 311/352
-                if(noteOne >= 352) //Replace with Song.noteCount later
-                    BuzzerOffTwo();
-                if(noteTwo >= 311)  //Tet:Tre
-                    state = LOSE;
-                if(getKey() == '#')
-                    state = LOSE;
-            }
-            if(song == 2)
-            {
-                playNoteTwo(&SONGOFSTORMS[noteOne], 0);
-                durationOne = SONGOFSTORMS[noteOne].duration;
-
-                if(loc_sixteenths - sixteenthsPassed == durationOne)
-                {
-                    noteOne++;
-                    sixteenthsPassed = loc_sixteenths;
-                    BuzzerOffTwo();
-                }
-
-                             //GOT: 46 SOS: 119  GF: 184/75  TMH: 181/54    TET: 311/352
-                if(noteOne >= 119) //Replace with Song.noteCount later
-                    state = LOSE;
-                if(getKey() == '#')
-                    state = LOSE;
-            }
-            */
             break;
         }
 
