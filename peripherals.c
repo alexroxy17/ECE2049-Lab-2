@@ -231,21 +231,26 @@ void configKeypad(void)
     // Optimized/reduced:
     // nsb -- 01 Feb 2019
 
-    P1SEL &= ~(BIT5|BIT4); //P1.4, 1.5 for I/0
-    P2SEL &= ~(BIT5);      //P2.5 for I/O
+    P1SEL &= ~(BIT5|BIT4); //P1.4, 1.5 for I/O
+    P2SEL &= ~(BIT5|BIT4); //P2.5, 2.4 for I/O
+    P4SEL &= ~(BIT3);       //P4.3 for I/O
 
     P1DS  &= ~BIT2; //Reset P1 drive strength
 
     // Setting up columns
-    P2DIR |= BIT5; //P2.5 Output
+    P2DIR |= (BIT5|BIT4); //P2.5, 2.4 Output
     P1DIR |= BIT5; //P1.5 Output
-    P2OUT |= BIT5; //P2.5 High
+
+    P2OUT |= (BIT5|BIT4); //P2.5, 2.4 High
     P1OUT |= BIT5; //P1.5 High
 
     // Setting up rows
     P1DIR &= ~BIT4; //Row 1.4 input
     P1REN |=  BIT4; //Row 1.4 REN
     P1OUT |=  BIT4; //Row 1.4 Pullup
+    P4DIR &= ~BIT3; //Row 4.3 input
+    P4REN |=  BIT3; //Row 4.3 REN
+    P4OUT |=  BIT3; //Row 4.3 Pullup
 }
 
 
@@ -257,17 +262,33 @@ unsigned char getKey(void)
     // Updated -- 14 Jan 2018
     // Updated for MSP430 Hero -- nsb -- 01 Feb 2019
 
+    // Set Col1 = ?, Col2 = ? and Col3 = ?
     unsigned char ret_val = 0;
 
     // Set Col1 = ?, Col2 = ? and Col3 = ?
     P1OUT &= ~BIT5;
-    P2OUT |=  BIT5;
+    P2OUT |= (BIT5|BIT4);
+    // Now check value from each rows
+    if ((P4IN & BIT3)==0)
+        ret_val = '1';
     if ((P1IN & BIT4)==0)
         ret_val = '*';
     P1OUT |= BIT5;
 
     // Set Col1 = ?, Col2 = ? and Col3 = ?
+    P2OUT &= ~BIT4;
+    // Now check value from each rows
+    if ((P4IN & BIT3)==0)
+        ret_val = '2';
+    if ((P1IN & BIT4)==0)
+        ret_val = '0';
+    P2OUT |= BIT4;
+
+    // Set Col1 = ?, Col2 = ? and Col3 = ?
     P2OUT &= ~BIT5;
+    // Now check value from each rows
+    if ((P4IN & BIT3)==0)
+        ret_val = '3';
     if ((P1IN & BIT4)==0)
         ret_val = '#';
     P2OUT |= BIT5;

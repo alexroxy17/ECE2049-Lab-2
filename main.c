@@ -10,7 +10,7 @@
 #include "songs.h"
 
 
-typedef enum {WELCOME,COUNTDOWN, PLAY, LOSE, WIN} eState;
+typedef enum {WELCOME,MENU,COUNTDOWN, PLAY, LOSE, WIN} eState;
 
 // Function Prototypes
 void swDelay(char numLoops);
@@ -42,6 +42,8 @@ void main(void)
     configKeypad();   //Configure keypad
     //initButtons();    //Configure buttons
     eState state = WELCOME; //Set initial state to welcome
+    Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
+    char song = 0;
 
     // Using msp430.h definitions
      _BIS_SR(GIE); // Global Interrupt enable VERY IMPORTANT
@@ -57,7 +59,6 @@ void main(void)
             BuzzerOff();
             BuzzerOffTwo();
             Graphics_clearDisplay(&g_sContext); // Clear the display
-            Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
             Graphics_drawRectangle(&g_sContext, &box);
             Graphics_drawStringCentered(&g_sContext, "MSP Hero", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "by", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);              //Writing text
@@ -74,9 +75,34 @@ void main(void)
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     moveOn = 1;
             }
-            state = COUNTDOWN;
+            state = MENU;
 
             break;
+        }
+        case MENU:
+        {
+            Graphics_clearDisplay(&g_sContext); // Clear the display
+            Graphics_drawRectangle(&g_sContext, &box);
+            Graphics_drawStringCentered(&g_sContext, "MENU: Choose a", AUTO_STRING_LENGTH, 48, 10, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "song with 1-3", AUTO_STRING_LENGTH, 48, 20, TRANSPARENT_TEXT);
+
+            Graphics_drawStringCentered(&g_sContext, "1:Grav. Falls", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "2:Tetris", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "3:Sng of Strms", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);
+            Graphics_flushBuffer(&g_sContext);  //Draw to display
+
+            volatile unsigned int moveOn = 0;   //Wait flag
+            char currKey;                       //Holds current key
+            while(moveOn == 0)
+            {
+                currKey = getKey();
+                if(currKey == '1')  //Query for star key, WAIT FOR INPUT
+                    song = 0,state = COUNTDOWN,moveOn = 1;
+                if(currKey == '2')  //Query for star key, WAIT FOR INPUT
+                    song = 1,state = COUNTDOWN,moveOn = 1;
+                if(currKey == '3')  //Query for star key, WAIT FOR INPUT
+                    song = 2,state = COUNTDOWN,moveOn = 1;
+            }
         }
 
         case COUNTDOWN: //Countdown from 3 to 1, with ~1 second interval
@@ -110,44 +136,81 @@ void main(void)
 
         case PLAY:
         {
-
-            //playNoteTwo(&takeMeHomeTreble[noteOne]);
-            //playNote(&takeMeHomeBass[noteTwo]);
-            playNoteTwo(&tetrisBass[noteOne], 1);
-            playNote(&tetrisTreble[noteTwo]);
-
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
-            //durationOne = takeMeHomeTreble[noteOne].duration;
-            //durationTwo = takeMeHomeBass[noteTwo].duration;
-            durationOne = tetrisBass[noteOne].duration;
-            durationTwo = tetrisTreble[noteTwo].duration;
-
-            if(loc_sixteenths - sixteenthsPassed == durationOne)
+            if(song == 0)
             {
-                noteOne++;
-                sixteenthsPassed = loc_sixteenths;
-                //BuzzerOff();
-                BuzzerOffTwo();
-            }
+                playNoteTwo(&gravityFallsBass[noteOne], 1);
+                playNote(&gravityFallsTreble[noteTwo]);
+                durationOne = gravityFallsBass[noteOne].duration;
+                durationTwo = gravityFallsTreble[noteTwo].duration;
 
-            if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
+                if(loc_sixteenths - sixteenthsPassed == durationOne)
+                {
+                    noteOne++;
+                    sixteenthsPassed = loc_sixteenths;
+                    BuzzerOffTwo();
+                }
+
+                if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
+                {
+                    noteTwo++;
+                    sixteenthsPassedTwo = loc_sixteenths_two;
+                    BuzzerOff();
+                }
+                             //GOT: 46 SOS: 119  GF: 184/75  TMH: 181/54    TET: 311/352
+                if(noteOne >= 184) //Replace with Song.noteCount later
+                    BuzzerOffTwo();
+                if(noteTwo >= 75)  //Tet:Tre
+                    state = LOSE;
+                if(getKey() == '#')
+                    state = LOSE;
+            }
+            if(song == 1)
             {
-                noteTwo++;
-                sixteenthsPassedTwo = loc_sixteenths_two;
-                BuzzerOff();
+                playNoteTwo(&tetrisBass[noteOne], 1);
+                playNote(&tetrisTreble[noteTwo]);
+                durationOne = tetrisBass[noteOne].duration;
+                durationTwo = tetrisTreble[noteTwo].duration;
+
+                if(loc_sixteenths - sixteenthsPassed == durationOne)
+                {
+                    noteOne++;
+                    sixteenthsPassed = loc_sixteenths;
+                    BuzzerOffTwo();
+                }
+
+                if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
+                {
+                    noteTwo++;
+                    sixteenthsPassedTwo = loc_sixteenths_two;
+                    BuzzerOff();
+                }
+                             //GOT: 46 SOS: 119  GF: 184/75  TMH: 181/54    TET: 311/352
+                if(noteOne >= 352) //Replace with Song.noteCount later
+                    BuzzerOffTwo();
+                if(noteTwo >= 311)  //Tet:Tre
+                    state = LOSE;
+                if(getKey() == '#')
+                    state = LOSE;
             }
+            if(song == 2)
+            {
+                playNoteTwo(&SONGOFSTORMS[noteOne], 1);
+                durationOne = SONGOFSTORMS[noteOne].duration;
 
+                if(loc_sixteenths - sixteenthsPassed == durationOne)
+                {
+                    noteOne++;
+                    sixteenthsPassed = loc_sixteenths;
+                    BuzzerOffTwo();
+                }
 
-                         //GOT: 46 SOS: 119  GF: 184/75  TMH: 181/54    TET: 311/352
-            if(noteOne >= 352) //Replace with Song.noteCount later
-                BuzzerOffTwo();
-
-            if(noteTwo >= 311)  //Tet:Tre
-                state = LOSE;
-
-            if(getKey() == '#')
-                state = LOSE;
-
+                             //GOT: 46 SOS: 119  GF: 184/75  TMH: 181/54    TET: 311/352
+                if(noteOne >= 119) //Replace with Song.noteCount later
+                    state = LOSE;
+                if(getKey() == '#')
+                    state = LOSE;
+            }
             break;
         }
 
