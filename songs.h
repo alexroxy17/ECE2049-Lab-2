@@ -15,6 +15,7 @@
 #include "gravityfalls.h"
 #include "takemehome.h"
 #include "tetris.h"
+#include "interstellar.h"
 
 typedef struct {
     Note* bigSpeaker;      //What notepattern to play on the large speaker
@@ -45,6 +46,14 @@ Song songOfStorms = {
                      1,
                      120,
                      120      //Disable playback for small speaker
+};
+
+Song interstellar = {
+                     interstellarTreble,
+                     interstellarBass,
+                     1,
+                     194,
+                     61
 };
 
 

@@ -10,7 +10,7 @@
 #include "songs.h"
 
 
-typedef enum {WELCOME,MENU,COUNTDOWN, PLAY, LOSE, WIN} eState;
+typedef enum {WELCOME,MENU,MENUPAGE2,COUNTDOWN, PLAY, LOSE, WIN} eState;
 
 // Function Prototypes
 void swDelay(char numLoops);
@@ -26,7 +26,7 @@ volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,dura
 __interrupt void TimerA2_ISR(void)
 {
     count++;
-    if (count % 18 == 0) //165 bpm
+    if (count % 30 == 0) //18=165 bpm, 30 = 100bpm
         sixteenths++;
 }
 
@@ -45,7 +45,7 @@ void main(void)
     eState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
     char song = 0;
-    Song songList[3] = {gravityFalls, tetris, songOfStorms};
+    Song songList[4] = {gravityFalls, tetris, songOfStorms, interstellar};
 
     // Using msp430.h definitions
      _BIS_SR(GIE); // Global Interrupt enable VERY IMPORTANT
@@ -91,6 +91,8 @@ void main(void)
             Graphics_drawStringCentered(&g_sContext, "1:Grav. Falls", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "2:Tetris", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "3:Sng of Strms", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "Press # for", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "next page", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);  //Draw to display
 
             volatile unsigned int moveOn = 0;   //Wait flag
@@ -99,12 +101,52 @@ void main(void)
             {
                 currKey = getKey();
                 if(currKey == '1')  //Query for star key, WAIT FOR INPUT
+                {
                     song = 0,state = COUNTDOWN,moveOn = 1;
+                    break;
+                }
                 if(currKey == '2')  //Query for star key, WAIT FOR INPUT
+                {
                     song = 1,state = COUNTDOWN,moveOn = 1;
+                    break;
+                }
                 if(currKey == '3')  //Query for star key, WAIT FOR INPUT
+                {
                     song = 2,state = COUNTDOWN,moveOn = 1;
+                    break;
+                }
+                if(currKey == '#')  //Query for star key, WAIT FOR INPUT
+                {
+                    state = MENUPAGE2,moveOn = 1;
+                    break;
+                }
             }
+            break;
+        }
+
+        case MENUPAGE2:
+        {
+            Graphics_clearDisplay(&g_sContext); // Clear the display
+            Graphics_drawRectangle(&g_sContext, &box);
+            Graphics_drawStringCentered(&g_sContext, "MENU: Choose a", AUTO_STRING_LENGTH, 48, 10, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "song with 1-3", AUTO_STRING_LENGTH, 48, 20, TRANSPARENT_TEXT);
+
+            Graphics_drawStringCentered(&g_sContext, "1:Interstellar", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "Press * for", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "previous page", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
+            Graphics_flushBuffer(&g_sContext);  //Draw to display
+
+            volatile unsigned int moveOn = 0;   //Wait flag
+            char currKey;                       //Holds current key
+            while(moveOn == 0)
+            {
+                currKey = getKey();
+                if(currKey == '1')  //Query for star key, WAIT FOR INPUT
+                    song = 3,state = COUNTDOWN,moveOn = 1;
+                if(currKey == '*')  //Query for star key, WAIT FOR INPUT
+                    state = MENU,moveOn = 1;
+            }
+            break;
         }
 
         case COUNTDOWN: //Countdown from 3 to 1, with ~1 second interval
@@ -140,8 +182,18 @@ void main(void)
         {
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
 
-            playNoteTwo(&songList[song].bigSpeaker[noteOne], songList[song].power);
-            playNote   (&songList[song].smlSpeaker[noteTwo]);
+
+            //If rest, don't play any music
+            if(&songList[song].bigSpeaker[noteOne] == REST)
+                BuzzerOffTwo();
+            else
+                playNoteTwo(&songList[song].bigSpeaker[noteOne], songList[song].power);
+
+            if(&songList[song].smlSpeaker[noteOne] == REST)
+                BuzzerOff();
+            else
+                playNote   (&songList[song].smlSpeaker[noteTwo]);
+
             durationOne = songList[song].bigSpeaker[noteOne].duration;
             durationTwo = songList[song].smlSpeaker[noteTwo].duration;
 
@@ -163,6 +215,7 @@ void main(void)
                 state = LOSE;
             if(getKey() == '#')
                 state = LOSE;
+
             break;
         }
 
