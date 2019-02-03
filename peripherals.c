@@ -16,8 +16,11 @@
 
 #include "peripherals.h"
 
+
 // Globals
 tContext g_sContext;    // user defined type used by graphics library
+unsigned int allFrequencies[] = {1,41,44,49,52,55,62,65,73,84,87,92,98,104,110,117, 123,131,139,147,156,156,165,175,185,196,208,220,233,247,262,262,277,277,294,311,330,349,370,392,415,440,466,494,523,554,587,622,622,659,698,740,784,831,831,880,932,932,988,1047, 1109, 1175, 1245, 1319, 1397, 1480, 1568, 1661, 1760, 1865, 1976, 2093, 2217, 2349, 2489, 2637, 2794, 2960, 3136, 3322, 3520, 3729, 3951, 4186, 4435, 4699, 4978};
+
 
 
 void initLeds(void)
@@ -172,7 +175,7 @@ void BuzzerOnFreq(int freq)
     TB0CTL  &= ~TBIE;                       // Explicitly Disable timer interrupts for safety
 
     // Now configure the timer period, which controls the PWM period
-    TB0CCR0   = 32768 / freq;           // Set the PWM period in ACLK ticks
+    TB0CCR0   = 32768 / allFrequencies[freq];           // Set the PWM period in ACLK ticks
     TB0CCTL0 &= ~CCIE;                  // Disable timer interrupts
 
     // Configure CC register 5, which is connected to our PWM pin TB0.5
@@ -181,18 +184,21 @@ void BuzzerOnFreq(int freq)
     TB0CCR5   = TB0CCR0/2;                  // Configure a 50% duty cycle
 }
 
-void BuzzerOnFreqTwo(int freq)
+void BuzzerOnFreqTwo(int freq, char strength)
 {
     // Initialize PWM output on P1.2, which corresponds to TA0.1
     P1SEL |= BIT2; // Select peripheral output mode for P1.2
     P1DIR |= BIT2;
-    P1DS  |= BIT2; //High drive strength
+    if(strength)
+        P1DS |=  BIT2; //High drive strength
+    else
+        P1DS &= ~BIT2; //Low drive strength
 
     TA0CTL  = (TASSEL__ACLK|ID__1|MC__UP);  // Configure Timer B0 to use ACLK, divide by 1, up mode
     TA0CTL  &= ~TBIE;                       // Explicitly Disable timer interrupts for safety
 
     // Now configure the timer period, which controls the PWM period
-    TA0CCR0   = 32768 / freq;           // Set the PWM period in ACLK ticks
+    TA0CCR0   = 32768 / allFrequencies[freq];           // Set the PWM period in ACLK ticks
     TA0CCTL0 &= ~CCIE;                  // Disable timer interrupts
 
     // Configure CC register 5, which is connected to our PWM pin TB0.5

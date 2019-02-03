@@ -12,12 +12,11 @@
 
 typedef enum {WELCOME,COUNTDOWN, PLAY, LOSE, WIN} eState;
 
-
 // Function Prototypes
 void swDelay(char numLoops);
 void swDelay2(char numLoops);
 void playNote(Note* note);
-void playNoteTwo(Note* note);
+void playNoteTwo(Note* note, char strength);
 void resetGlobals(void);
 
 
@@ -92,7 +91,7 @@ void main(void)
                 Graphics_drawStringCentered(&g_sContext, readyText, AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
                 Graphics_drawStringCentered(&g_sContext, countdown[i], AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
                 Graphics_flushBuffer(&g_sContext);
-                BuzzerOnFreq(3520);
+                BuzzerOnFreq(NOTE_C5);
                 swDelay(1);
                 BuzzerOff();
                 swDelay(7);
@@ -114,14 +113,14 @@ void main(void)
 
             //playNoteTwo(&takeMeHomeTreble[noteOne]);
             //playNote(&takeMeHomeBass[noteTwo]);
-            playNoteTwo(&gravityFallsBass[noteOne]);
-            playNote(&gravityFallsTreble[noteTwo]);
+            playNoteTwo(&tetrisBass[noteOne], 1);
+            playNote(&tetrisTreble[noteTwo]);
 
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
             //durationOne = takeMeHomeTreble[noteOne].duration;
             //durationTwo = takeMeHomeBass[noteTwo].duration;
-            durationOne = gravityFallsBass[noteOne].duration;
-            durationTwo = gravityFallsTreble[noteTwo].duration;
+            durationOne = tetrisBass[noteOne].duration;
+            durationTwo = tetrisTreble[noteTwo].duration;
 
             if(loc_sixteenths - sixteenthsPassed == durationOne)
             {
@@ -139,12 +138,12 @@ void main(void)
             }
 
 
-                         //GOT: 46 SOS: 119  GF: 184/75  TMH: 181/54
-            if(noteOne >= 184) //Replace with Song.noteCount later
-                state = LOSE;
+                         //GOT: 46 SOS: 119  GF: 184/75  TMH: 181/54    TET: 311/352
+            if(noteOne >= 352) //Replace with Song.noteCount later
+                BuzzerOffTwo();
 
-            if(noteTwo >= 75)
-                BuzzerOff();
+            if(noteTwo >= 311)  //Tet:Tre
+                state = LOSE;
 
             if(getKey() == '#')
                 state = LOSE;
@@ -186,9 +185,9 @@ void playNote(Note* note)
     BuzzerOnFreq(note->pitch);
 }
 
-void playNoteTwo(Note* note)
+void playNoteTwo(Note* note, char strength)
 {
-    BuzzerOnFreqTwo(note->pitch);
+    BuzzerOnFreqTwo(note->pitch, strength);
 }
 
 void resetGlobals(void)

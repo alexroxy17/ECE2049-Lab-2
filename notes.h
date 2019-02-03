@@ -12,7 +12,7 @@
 
 typedef struct {
     unsigned int pitch;         //Note pitch
-    unsigned int duration;      //Note duration
+    char duration;      //Note duration
     char LED;                   //LEDs to light for each note
 } Note; //40 bits per note, 2.5 bytes
 
@@ -24,86 +24,94 @@ typedef struct {
 #define HALF   16
 #define FULL   32
 
-//Note Pitches
-#define REST     1
-
-#define NOTE_C2  65
-#define NOTE_D2  73
-#define NOTE_E2  84
-#define NOTE_F2  87
-#define NOTE_G2  98
-#define NOTE_A2  110
-#define NOTE_B2  123
-#define NOTE_C3  131
-#define NOTE_Cs3 139
-#define NOTE_D3  147
-#define NOTE_Ds3 156
-#define NOTE_Eb3 156
-#define NOTE_E3  165
-#define NOTE_F3  175
-#define NOTE_Fs3 185
-#define NOTE_G3  196
-#define NOTE_Gs3 208
-#define NOTE_A3  220
-#define NOTE_As3 233
-#define NOTE_B3  247
-#define NOTE_Bs3 262
-#define NOTE_C4  262
-#define NOTE_Cs4 277
-#define NOTE_Db4 277
-#define NOTE_D4  294
-#define NOTE_Ds4 311
-#define NOTE_E4  330
-#define NOTE_F4  349
-#define NOTE_Fs4 370
-#define NOTE_G4  392
-#define NOTE_Gs4 415
-
-#define NOTE_A4  440
-#define NOTE_Bb4 466 //B flat
-#define NOTE_B4  494
-#define NOTE_C5  523
-#define NOTE_Cs5 554 //C Sharp
-#define NOTE_D5  587
-#define NOTE_Eb5 622
-#define NOTE_E5  659
-#define NOTE_F5  698
-#define NOTE_Fs5 740
-#define NOTE_G5  784
-#define NOTE_Ab 831
-#define NOTE_A5  880
-
-#define NOTE_As5 932
-#define NOTE_Bb5 932
-#define NOTE_B5  988
-#define NOTE_C6  1047
-#define NOTE_Cs6 1109
-#define NOTE_D6  1175
-#define NOTE_Ds6 1245
-#define NOTE_E6  1319
-#define NOTE_F6  1397
-#define NOTE_Fs6 1480
-#define NOTE_G6  1568
-#define NOTE_Gs6 1661
-#define NOTE_A6  1760
-#define NOTE_As6 1865
-#define NOTE_B6  1976
-#define NOTE_C7  2093
-#define NOTE_Cs7 2217
-#define NOTE_D7  2349
-#define NOTE_Ds7 2489
-#define NOTE_E7  2637
-#define NOTE_F7  2794
-#define NOTE_Fs7 2960
-#define NOTE_G7  3136
-#define NOTE_Gs7 3322
-#define NOTE_A7  3520
-#define NOTE_As7 3729
-#define NOTE_B7  3951
-#define NOTE_C8  4186
-#define NOTE_Cs8 4435
-#define NOTE_D8  4699
-#define NOTE_Ds8 4978
+//Note Pitches: These are indices to a master notelist.
+#define REST     0
+#define NOTE_E1  1
+#define NOTE_F1  2
+#define NOTE_G1  3
+#define NOTE_Gs1 4
+#define NOTE_A1  5
+#define NOTE_B1  6
+#define NOTE_C2  7
+#define NOTE_D2  8
+#define NOTE_E2  9
+#define NOTE_F2  10
+#define NOTE_Fs2 11
+#define NOTE_G2  12
+#define NOTE_Gs2 13
+#define NOTE_A2  14
+#define NOTE_As2 15
+#define NOTE_B2  16
+#define NOTE_C3  17
+#define NOTE_Cs3 18
+#define NOTE_D3  19
+#define NOTE_Ds3 20
+#define NOTE_Eb3 21
+#define NOTE_E3  22
+#define NOTE_F3  23
+#define NOTE_Fs3 24
+#define NOTE_G3  25
+#define NOTE_Gs3 26
+#define NOTE_A3  27
+#define NOTE_As3 28
+#define NOTE_B3  29
+#define NOTE_Bs3 30
+#define NOTE_C4  31
+#define NOTE_Cs4 32
+#define NOTE_Db4 33
+#define NOTE_D4  34
+#define NOTE_Ds4 35
+#define NOTE_E4  36
+#define NOTE_F4  37
+#define NOTE_Fs4 38
+#define NOTE_G4  39
+#define NOTE_Gs4 40
+#define NOTE_A4  41
+#define NOTE_Bb4 42
+#define NOTE_B4  43
+#define NOTE_C5  44
+#define NOTE_Cs5 45
+#define NOTE_D5  46
+#define NOTE_Ds5 47
+#define NOTE_Eb5 48
+#define NOTE_E5  49
+#define NOTE_F5  50
+#define NOTE_Fs5 51
+#define NOTE_G5  52
+#define NOTE_Gs5 53
+#define NOTE_Ab  54
+#define NOTE_A5  55
+#define NOTE_As5 56
+#define NOTE_Bb5 57
+#define NOTE_B5  58
+#define NOTE_C6  59
+#define NOTE_Cs6 60
+#define NOTE_D6  61
+#define NOTE_Ds6 62
+#define NOTE_E6  63
+#define NOTE_F6  64
+#define NOTE_Fs6 65
+#define NOTE_G6  66
+#define NOTE_Gs6 67
+#define NOTE_A6  68
+#define NOTE_As6 69
+#define NOTE_B6  70
+#define NOTE_C7  71
+#define NOTE_Cs7 72
+#define NOTE_D7  73
+#define NOTE_Ds7 74
+#define NOTE_E7  75
+#define NOTE_F7  76
+#define NOTE_Fs7 77
+#define NOTE_G7  78
+#define NOTE_Gs7 79
+#define NOTE_A7  80
+#define NOTE_As7 81
+#define NOTE_B7  82
+#define NOTE_C8  83
+#define NOTE_Cs8 84
+#define NOTE_D8  85
+#define NOTE_Ds8 86
 
 
 #endif /* NOTES_H_ */

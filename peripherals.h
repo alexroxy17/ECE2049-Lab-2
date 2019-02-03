@@ -76,7 +76,7 @@ void configureUserLED(char inbits);
 
 void configDisplay(void);
 void BuzzerOnFreq(int freq);
-void BuzzerOnFreqTwo(int freq);
+void BuzzerOnFreqTwo(int freq, char strength);
 void BuzzerOff(void);
 void BuzzerOffTwo(void);
 

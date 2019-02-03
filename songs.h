@@ -15,5 +15,7 @@
 #include "gameofthrones.h"
 #include "gravityfalls.h"
 #include "takemehome.h"
+#include "tetris.h"
+
 
 #endif /* SONGS_H_ */
