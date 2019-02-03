@@ -13,7 +13,6 @@
 typedef struct {
     unsigned int pitch;         //Note pitch
     char duration;      //Note duration
-    char LED;                   //LEDs to light for each note
 } Note; //40 bits per note, 2.5 bytes
 
 //Note Lengths

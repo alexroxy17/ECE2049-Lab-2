@@ -195,7 +195,7 @@ void main(void)
             }
             if(song == 2)
             {
-                playNoteTwo(&SONGOFSTORMS[noteOne], 1);
+                playNoteTwo(&SONGOFSTORMS[noteOne], 0);
                 durationOne = SONGOFSTORMS[noteOne].duration;
 
                 if(loc_sixteenths - sixteenthsPassed == durationOne)
