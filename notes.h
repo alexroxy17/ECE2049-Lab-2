@@ -11,7 +11,7 @@
 
 
 typedef struct {
-    unsigned int pitch;         //Note pitch
+    char pitch;         //Note pitch
     char duration;      //Note duration
 } Note; //40 bits per note, 2.5 bytes
 
