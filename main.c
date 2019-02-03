@@ -21,6 +21,7 @@ void resetGlobals(void);
 
 
 volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0;
+
 #pragma vector=TIMER2_A0_VECTOR
 __interrupt void TimerA2_ISR(void)
 {
@@ -44,6 +45,7 @@ void main(void)
     eState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
     char song = 0;
+    Song songList[3] = {gravityFalls, tetris, songOfStorms};
 
     // Using msp430.h definitions
      _BIS_SR(GIE); // Global Interrupt enable VERY IMPORTANT
@@ -137,6 +139,32 @@ void main(void)
         case PLAY:
         {
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
+
+            playNoteTwo(&songList[song].bigSpeaker[noteOne], songList[song].power);
+            playNote(&songList[song].littleSpeaker[noteTwo]);
+            durationOne = songList[song].bigSpeaker[noteOne].duration;
+            durationTwo = songList[song].littleSpeaker[noteTwo].duration;
+
+            if(loc_sixteenths - sixteenthsPassed == durationOne)
+            {
+                noteOne++;
+                sixteenthsPassed = loc_sixteenths;
+                BuzzerOffTwo();
+            }
+            if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
+            {
+                noteTwo++;
+                sixteenthsPassedTwo = loc_sixteenths_two;
+                BuzzerOff();
+            }
+            if(noteOne >= songList[song].bigSpeakerCount)
+                BuzzerOffTwo();
+            if(noteTwo >= songList[song].smlSpeakerCount)
+                state = LOSE;
+            if(getKey() == '#')
+                state = LOSE;
+
+            /*
             if(song == 0)
             {
                 playNoteTwo(&gravityFallsBass[noteOne], 1);
@@ -211,6 +239,7 @@ void main(void)
                 if(getKey() == '#')
                     state = LOSE;
             }
+            */
             break;
         }
 

@@ -16,5 +16,36 @@
 #include "takemehome.h"
 #include "tetris.h"
 
+typedef struct {
+    Note* bigSpeaker;      //What notepattern to play on the large speaker
+    Note* littleSpeaker;   //What notepattern to play on the small speaker
+    char power:1;             //What power the large speaker should play at. Only need 1 bit: 0 or 1.
+    unsigned int bigSpeakerCount:9;   //Number of notes for the large speaker. Only need 9 bits.
+    unsigned int smlSpeakerCount:9;   //Number of notes for the small speaker. Only need 9 bits.
+} Song;
+
+Song tetris = {
+               tetrisBass,
+               tetrisTreble,
+               1,
+               352,
+               311
+};
+
+Song gravityFalls = {
+                     gravityFallsBass,
+                     gravityFallsTreble,
+                     0,
+                     184,
+                     75
+};
+Song songOfStorms = {
+                     SONGOFSTORMS,
+                     SONGOFSTORMS,  //Repeat, since there is no bass line (yet)
+                     1,
+                     120,
+                     120      //Disable playback for small speaker
+};
+
 
 #endif /* SONGS_H_ */

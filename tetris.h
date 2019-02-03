@@ -7,7 +7,8 @@
 
 #ifndef TETRIS_H_
 #define TETRIS_H_
-
+//Treble: 311
+//Bass: 352
 Note tetrisTreble[] = {
 
                      {NOTE_E5,4},

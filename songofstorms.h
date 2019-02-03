@@ -24,7 +24,6 @@ Note SONGOFSTORMS [] = {
     {NOTE_F5,  2},
     {NOTE_E5,  2},
     {NOTE_F5,  2}, //10
-    //E4 D4 A4
     {NOTE_E5,  2},
     {NOTE_C5,  2}, //Corrected from D5
     {NOTE_A4,  7},
@@ -43,8 +42,8 @@ Note SONGOFSTORMS [] = {
     {NOTE_F4,  2},
     {NOTE_G4,  2},
 
-    {NOTE_F4,  10},//25
-    //Midpoint, start over
+    {NOTE_F4,  10},//25     //Midpoint, start over
+
     {NOTE_D4,  2},
     {NOTE_F4,  2},
     {NOTE_D5,  8},
@@ -57,7 +56,7 @@ Note SONGOFSTORMS [] = {
     {NOTE_F5,  2},
     {NOTE_E5,  2},
     {NOTE_F5,  2}, //35
-    //E4 D4 A4
+
     {NOTE_E5,  2},
     {NOTE_C5,  2},
     {NOTE_A4,  7},

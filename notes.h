@@ -9,19 +9,10 @@
 #define NOTES_H_
 
 typedef struct {
-    char pitch:7;         //Note pitch
-    char duration:6;      //Note duration
-} Note; //16 bits per note, 1 byte. Down from 40 bits per note
+    char pitch:7;         //Note pitch. Only need 7 bits: 0-127
+    char duration:6;      //Note duration. Only need 6 bits: 0-65
+} Note; //13 bits per note. Down from 16 bits per note, 1 byte. Down from 40 bits per note
 
-/*
-typedef struct {
-    Note bigSpeaker[];      //What notepattern to play on the large speaker
-    Note littleSpeaker[];   //What notepattern to play on the small speaker
-    char power;             //What power the large speaker should play at
-    unsigned int bigSpeakerCount;   //Number of notes for the large speaker
-    unsigned int smlSpeakerCount;   //Number of notes for the small speaker
-} Song;
-*/
 
 
 //Note Lengths
