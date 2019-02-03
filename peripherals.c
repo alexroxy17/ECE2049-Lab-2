@@ -189,10 +189,6 @@ void BuzzerOnFreqTwo(int freq, char strength)
     // Initialize PWM output on P1.2, which corresponds to TA0.1
     P1SEL |= BIT2; // Select peripheral output mode for P1.2
     P1DIR |= BIT2;
-    if(strength)
-        P1DS |=  BIT2; //High drive strength
-    else
-        P1DS &= ~BIT2; //Low drive strength
 
     TA0CTL  = (TASSEL__ACLK|ID__1|MC__UP);  // Configure Timer B0 to use ACLK, divide by 1, up mode
     TA0CTL  &= ~TBIE;                       // Explicitly Disable timer interrupts for safety

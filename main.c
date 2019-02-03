@@ -174,6 +174,11 @@ void main(void)
 
 
             resetGlobals();
+            if(songList[song].power)
+                P1DS |=  BIT2; //High drive strength
+            else
+                P1DS &= ~BIT2; //Low drive strength
+
             state = PLAY;
             break;
         }
