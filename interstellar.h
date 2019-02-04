@@ -477,8 +477,10 @@ Note interstellarTreble[] = {
                              {NOTE_E5,1},
                              {NOTE_C6,2},
                              {NOTE_A6,4},
-                             {NOTE_C6,2},
-                             {NOTE_C6,2},//
+                             {NOTE_C6,1},
+                             {REST,1},
+                             {NOTE_C6,1},//
+                             {REST,1},
 
                              {NOTE_C6,4},
                              {NOTE_A6,4},
@@ -491,8 +493,10 @@ Note interstellarTreble[] = {
                              {NOTE_C5,1},
                              {NOTE_D6,2},
                              {NOTE_G6,4},
-                             {NOTE_D6,2},
-                             {NOTE_D6,2},//
+                             {NOTE_D6,1},
+                             {REST,1},
+                             {NOTE_D6,1},//
+                             {REST,1},
 
                              {NOTE_D6,4},   //******************** Line 64 ********************//
                              {NOTE_G6,4},

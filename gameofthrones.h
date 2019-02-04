@@ -156,14 +156,6 @@ Note GAMEOFTHRONES[] = {
     {NOTE_C4, 8},
     {NOTE_E4, 2},
     {NOTE_F4, 2},
-
-    {NOTE_B4, 8},
-    {NOTE_G3, 2},
-    {NOTE_C4, 2},
-
-    {NOTE_B4, 8},
-    {NOTE_G3, 2},
-    {NOTE_C4, 2}
 };
 
 Note GAMEOFTHRONESBACKUP[] = {

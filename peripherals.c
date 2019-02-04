@@ -27,10 +27,10 @@ void initLeds(void)
 {
     // Configure LEDs as outputs, initialize to logic low (off)
     // Note the assigned port pins are out of order test board
-    // Red     P6.2
-    // Green   P6.1
-    // Blue    P6.3
-    // Yellow  P6.4
+    // Red     P6.2 D1
+    // Green   P6.1 D2
+    // Blue    P6.3 D3
+    // Yellow  P6.4 D4
     // smj -- 27 Dec 2016
 
     P6SEL &= ~(BIT4|BIT3|BIT2|BIT1);
@@ -62,23 +62,24 @@ char getButtons(void)
 {
     //  S1   S2   S3   S4
     //  7.0  3.6  2.2  7.4
-    char s1,s2,s3,s4,ret=0;
+    unsigned char s1,s2,s3,s4;
 
-    s1 = ~(P7IN & BIT0);    //s1 is 1 if P7.0 is 0
-    s2 = ~(P3IN & BIT6);    //button is pressed if value is zero!
-    s3 = ~(P2IN & BIT2);
-    s4 = ~(P7IN & BIT4);
+    s1 = (~P7IN & BIT0);    //s1 is 1 if P7.0 is 0
+    s2 = (~P3IN & BIT6);    //button is pressed if value is zero!
+    s3 = (~P2IN & BIT2);
+    s4 = (~P7IN & BIT4);
 
-    if(s1)
-        ret |= BIT0;
-    if(s2)
-        ret |= BIT1;
-    if(s3)
-        ret |= BIT2;
-    if(s4)
-        ret |= BIT3;
 
-    return ret;
+    if(s1 == 1)
+        return 1;
+    if(s2 == 1)
+        return 2;
+    if(s3 == 1)
+        return 3;
+    if(s4 == 1)
+        return 4;
+    else
+        return 0;
 }
 
 void configureUserLED(char inbits)
@@ -140,22 +141,24 @@ void setLeds(unsigned char state)
     // Input: state = hex values to display (in low nibble)
     // Output: none
     //
-    // smj, ECE2049, 27 Dec 2015
-
-    unsigned char mask = 0;
 
     // Turn all LEDs off to start
+    if(state != REST)
+        state = (state%4)+1;    //If state is not a rest
+    else
+        state = 0;
+
     P6OUT &= ~(BIT4|BIT3|BIT2|BIT1);
 
-    if (state & BIT0)
-        mask |= BIT4;   // Right most LED P6.4
-    if (state & BIT1)
-        mask |= BIT3;   // next most right LED P.3
-    if (state & BIT2)
-        mask |= BIT1;   // third most left LED P6.1
-    if (state & BIT3)
-        mask |= BIT2;   // Left most LED on P6.2
-    P6OUT |= mask;
+    if (state == 1)
+        P6OUT |= BIT2;  //Leftmost
+    if (state == 2)
+        P6OUT |= BIT1;  //Second from left
+    if (state == 3)
+        P6OUT |= BIT3;  //Second from right
+    if (state == 4)
+        P6OUT |= BIT4;  //Rightmost
+
 }
 
 
@@ -184,7 +187,7 @@ void BuzzerOnFreq(int freq)
     TB0CCR5   = TB0CCR0/2;                  // Configure a 50% duty cycle
 }
 
-void BuzzerOnFreqTwo(int freq, char strength)
+void BuzzerOnFreqTwo(int freq)
 {
     // Initialize PWM output on P1.2, which corresponds to TA0.1
     P1SEL |= BIT2; // Select peripheral output mode for P1.2
