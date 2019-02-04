@@ -19,6 +19,7 @@ void swDelay2(char numLoops);
 void playNote(Note* note);
 void playNoteTwo(Note* note);
 void resetGlobals(void);
+void pressButtons(void);
 
 volatile unsigned int totalDifficulty = 1;
 volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0, wrongNotes = 0, totalWrongNotes=0, difficulty = 1, demo = 0;
@@ -79,6 +80,7 @@ void main(void)
                 currKey = getKey();
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     moveOn = 1;
+                //pressButtons();
             }
             state = MENU;
 
@@ -227,7 +229,7 @@ void main(void)
                 P1DS &= ~BIT2;              //Low drive strength
 
             tempo = songList[song].tempo;   //Set correct song tempo
-            totalDifficulty = (tempo*difficulty)
+            totalDifficulty = (tempo*difficulty);
             state = PLAY;
             break;
         }
@@ -266,8 +268,8 @@ void main(void)
                 noteTwo++;
                 sixteenthsPassedTwo = loc_sixteenths_two;
                 BuzzerOff();
-                buttonPress = getButtons();
-
+                //buttonPress = getButtons();
+/*
                 if(!demo)   //Only count mispresses if the game is not in a demo.
                 {
                     if(buttonPress != correctLED)
@@ -276,8 +278,8 @@ void main(void)
 */
             }
 
-            if((noteOne >= songList[song].bigSpeakerCount) | (noteTwo >= songList[song].smlSpeakerCount))   //If song is over
-                state = WIN;            //If song is over, player wins
+            //if((noteOne >= songList[song].bigSpeakerCount) | (noteTwo >= songList[song].smlSpeakerCount))   //If song is over
+              //  state = WIN;            //If song is over, player wins
 
             if(getKey() == '#')         //Quit game if necessary
                 state = QUIT;
@@ -376,7 +378,7 @@ void main(void)
 void playNote(Note* note)
 {
     BuzzerOnFreq(note->pitch);
-    setLeds(note->pitch);
+    setLeds(((note->pitch)%4)+1);
 }
 
 void playNoteTwo(Note* note)
@@ -399,6 +401,11 @@ void resetGlobals(void)
     demo = 0;
 }
 
+void pressButtons(void)
+{
+    char foo = getButtons();
+    setLeds(foo);
+}
 
 
 

@@ -62,7 +62,7 @@ char getButtons(void)
 {
     //  S1   S2   S3   S4
     //  7.0  3.6  2.2  7.4
-    unsigned char s1,s2,s3,s4;
+    char s1=0,s2=0,s3=0,s4=0;
 
     s1 = (~P7IN & BIT0);    //s1 is 1 if P7.0 is 0
     s2 = (~P3IN & BIT6);    //button is pressed if value is zero!
@@ -70,13 +70,13 @@ char getButtons(void)
     s4 = (~P7IN & BIT4);
 
 
-    if(s1 == 1)
+    if(s1)
         return 1;
-    if(s2 == 1)
+    if(s2)
         return 2;
-    if(s3 == 1)
+    if(s3)
         return 3;
-    if(s4 == 1)
+    if(s4)
         return 4;
     else
         return 0;
@@ -89,8 +89,8 @@ void configureUserLED(char inbits)
 
     P1DIR |=  (BIT0); //Select LED1 for output
     P4DIR |=  (BIT7); //Select LED2 for output
-
-    inbits &= (BIT0|BIT1); //Mask inbits to only two LSB
+    inbits--;
+    //inbits &= (BIT0|BIT1); //Mask inbits to only two LSB
 
     switch(inbits)
     {
@@ -143,21 +143,25 @@ void setLeds(unsigned char state)
     //
 
     // Turn all LEDs off to start
-    if(state != REST)
-        state = (state%4)+1;    //If state is not a rest
-    else
-        state = 0;
+    //if(state != REST)
+      //  state = (state%4)+1;    //If state is not a rest
+    //else
+      //  state = 0;
 
     P6OUT &= ~(BIT4|BIT3|BIT2|BIT1);
 
     if (state == 1)
         P6OUT |= BIT2;  //Leftmost
-    if (state == 2)
+    else if (state == 2)
         P6OUT |= BIT1;  //Second from left
-    if (state == 3)
+    else if (state == 3)
         P6OUT |= BIT3;  //Second from right
-    if (state == 4)
+    else if (state == 4)
         P6OUT |= BIT4;  //Rightmost
+    else if (state == 0)
+        P6OUT |= (BIT2|BIT1|BIT3|BIT4);
+    else
+        P6OUT &= ~(BIT2|BIT1|BIT3|BIT4);
 
 }
 
