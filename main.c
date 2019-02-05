@@ -10,7 +10,7 @@
 #include "songs.h"
 
 
-typedef enum {WELCOME,MENU,MENUPAGE2,COUNTDOWN, PLAY, LOSE, WIN, QUIT, DIFFICULTYSELECT} eState;
+typedef enum {WELCOME,MENU,MENUPAGE2,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POSTQUIT, DIFFICULTYSELECT} eState;
 
 
 // Function Prototypes
@@ -23,7 +23,7 @@ void pressButtons(void);
 
 volatile unsigned int totalDifficulty = 1;
 volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0, wrongNotes = 0, totalWrongNotes=0, difficulty = 1, demo = 0;
-char tempo = 18;    //init tempo to 165 bpm
+char tempo = 18, foo=4;    //init tempo to 165 bpm, foo to 4
 
 
 #pragma vector=TIMER2_A0_VECTOR
@@ -72,7 +72,7 @@ void main(void)
             Graphics_drawStringCentered(&g_sContext, "Press * to", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "start", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);                                                                         //Refreshing screen
-
+            setLeds(0);
             volatile unsigned int moveOn = 0;   //Wait flag
             char currKey;                       //Holds current key
             while(moveOn == 0)
@@ -355,7 +355,6 @@ void main(void)
             BuzzerOffTwo(); //Reset buzzers
             setLeds(REST);     //Reset LEDs
             resetGlobals(); //Reset globals
-            stopTimer();    //Stop  timer
             Graphics_drawStringCentered(&g_sContext, "GAME", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "OVER:", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "You quit!", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
@@ -363,14 +362,46 @@ void main(void)
             Graphics_drawStringCentered(&g_sContext, "Press *", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);
 
-            volatile unsigned int moveOn = 0;
-            while(moveOn == 0)
+            state = POSTQUIT;
+        }
+        case POSTQUIT:
+        {
+            volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
+            if((&lossTone.bigSpeaker[noteOne] == REST) | (noteOne >= lossTone.bigSpeakerCount)) //If note is a rest or song is done
+                BuzzerOffTwo();
+            else
+                playNoteTwo(&lossTone.bigSpeaker[noteOne]); //Else, play appropriate note with appropriate power
+            durationOne = lossTone.bigSpeaker[noteOne].duration;
+
+
+            if(loc_sixteenths - sixteenthsPassed == durationOne)
             {
-                char currKey = getKey();
-                if(currKey == '*')    //Wait for user to press * key
-                    moveOn = 1;
+                noteOne++;
+                sixteenthsPassed = loc_sixteenths;
+                BuzzerOffTwo();
+                setLeds(foo);
+                foo--;
+                if(foo <= 0)
+                    foo = 4;
             }
-            state = WELCOME;
+
+            if(noteOne >= lossTone.bigSpeakerCount)   //If song is over
+            {
+                volatile unsigned int moveOn = 0;
+                while(moveOn == 0)
+                {
+                    char currKey = getKey();
+                    if(currKey == '*')    //Wait for user to press * key
+                        moveOn = 1;
+                }
+                resetGlobals();
+                state = WELCOME;
+                stopTimer();    //Stop  timer
+
+                break;
+            }
+            break;
+
         }
 
         }//End switch

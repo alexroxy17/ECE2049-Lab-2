@@ -17,6 +17,7 @@
 #include "tetris.h"
 #include "interstellar.h"
 #include "despacito.h"
+#include "miscSounds.h"
 
 typedef struct {
     Note* bigSpeaker;                   //What notepattern to play on the large speaker
@@ -69,6 +70,15 @@ Song despacito = {
                      0,
                      438,
                      353
+};
+
+Song lossTone = {
+                 loss,
+                 loss,
+                 18,
+                 0,
+                 24,
+                 24
 };
 
 
