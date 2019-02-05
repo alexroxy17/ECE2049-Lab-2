@@ -49,7 +49,7 @@ void main(void)
     eState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
     char song = 0;
-    Song songList[5] = {gravityFalls, tetris, songOfStorms, interstellar, despacito};
+    Song songList[5] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito};
     Song effectList[2] = {lossTone, winTone};
 
     // Using msp430.h definitions
@@ -96,7 +96,7 @@ void main(void)
 
             Graphics_drawStringCentered(&g_sContext, "1:Grav. Falls", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "2:Tetris", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
-            Graphics_drawStringCentered(&g_sContext, "3:Sng of Thrns", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "3:Game of Thrns", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "Press # for", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "next page", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);  //Draw to display
@@ -431,7 +431,12 @@ void playNote(Note* note, char ledToggle)
 {
     BuzzerOnFreq(note->pitch);
     if(ledToggle)
-        setLeds(((note->pitch)%4)+1);
+    {
+        if((note->pitch)!=REST)
+            setLeds(((note->pitch)%4)+1);
+        else
+            setLeds(0);
+    }
 }
 
 void playNoteTwo(Note* note)

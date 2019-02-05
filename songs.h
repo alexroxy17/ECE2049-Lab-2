@@ -45,13 +45,13 @@ Song gravityFalls = {
                      184,
                      75
 };
-Song songOfStorms = {
-                     SONGOFSTORMS,
-                     SONGOFSTORMS,  //Repeat, since there is no bass line (yet)
+Song gameOfThrones = {
+                     gotTreb,
+                     gotBass,  //Repeat, since there is no bass line (yet)
                      18,
                      0,
-                     230,
-                     230      //Disable playback for small speaker by duplicating it
+                     296,
+                     224      //Disable playback for small speaker by duplicating it
 };
 
 Song interstellar = {

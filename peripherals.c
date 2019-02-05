@@ -159,7 +159,7 @@ void setLeds(unsigned char state)
     else if (state == 4)
         P6OUT |= BIT4;  //Rightmost
     else if (state == 0)
-        P6OUT |= (BIT2|BIT1|BIT3|BIT4);
+        P6OUT &= ~(BIT2|BIT1|BIT3|BIT4);
     else
         P6OUT &= ~(BIT2|BIT1|BIT3|BIT4);
 
