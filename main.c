@@ -19,8 +19,9 @@ void swDelay2(char numLoops);
 void playNote(Note* note);
 void playNoteTwo(Note* note);
 void resetGlobals(void);
+void pressButtons(void);
 
-
+volatile unsigned int totalDifficulty = 1;
 volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0, wrongNotes = 0, totalWrongNotes=0, difficulty = 1, demo = 0;
 char tempo = 18;    //init tempo to 165 bpm
 
@@ -29,7 +30,7 @@ char tempo = 18;    //init tempo to 165 bpm
 __interrupt void TimerA2_ISR(void)
 {
     count++;
-    if (count % (tempo*difficulty) == 0) //18=165 bpm, 30 = 100bpm
+    if (count % totalDifficulty == 0) //18=165 bpm, 30 = 100bpm
         sixteenths++;
 }
 
@@ -79,6 +80,7 @@ void main(void)
                 currKey = getKey();
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     moveOn = 1;
+                //pressButtons();
             }
             state = MENU;
 
@@ -103,22 +105,22 @@ void main(void)
             while(moveOn == 0)
             {
                 currKey = getKey();
-                if(currKey == '1')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '1')  //Query for 1 key, WAIT FOR INPUT
                 {
                     song = 0,state = DIFFICULTYSELECT,moveOn = 1;
                     break;
                 }
-                if(currKey == '2')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '2')  //Query for 2 key, WAIT FOR INPUT
                 {
                     song = 1,state = DIFFICULTYSELECT,moveOn = 1;
                     break;
                 }
-                if(currKey == '3')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '3')  //Query for 3 key, WAIT FOR INPUT
                 {
                     song = 2,state = DIFFICULTYSELECT,moveOn = 1;
                     break;
                 }
-                if(currKey == '#')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '#')  //Query for pound key, WAIT FOR INPUT
                 {
                     state = MENUPAGE2,moveOn = 1;
                     break;
@@ -145,7 +147,7 @@ void main(void)
             while(moveOn == 0)
             {
                 currKey = getKey();
-                if(currKey == '1')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '1')  //Query for 1 key, WAIT FOR INPUT
                     song = 3,state = DIFFICULTYSELECT,moveOn = 1;
                 if(currKey == '2')  //Query for star key, WAIT FOR INPUT
                     song = 4,state = DIFFICULTYSELECT,moveOn = 1;
@@ -175,22 +177,22 @@ void main(void)
             while(moveOn == 0)
             {
                 currKey = getKey();
-                if(currKey == '1')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '1')  //Query for 1 key, WAIT FOR INPUT
                 {
                     difficulty = 4,state = COUNTDOWN,moveOn = 1;
                     break;
                 }
-                if(currKey == '2')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '2')  //Query for 2 key, WAIT FOR INPUT
                 {
                     difficulty = 3,state = COUNTDOWN,moveOn = 1;
                     break;
                 }
-                if(currKey == '3')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '3')  //Query for 3 key, WAIT FOR INPUT
                 {
                     difficulty = 1,state = COUNTDOWN,moveOn = 1;
                     break;
                 }
-                if(currKey == '0')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '0')  //Query for 0 key, WAIT FOR INPUT
                 {
                     difficulty = 1,state = COUNTDOWN,moveOn = 1, demo = 1;
                     break;
@@ -230,17 +232,17 @@ void main(void)
                 P1DS &= ~BIT2;              //Low drive strength
 
             tempo = songList[song].tempo;   //Set correct song tempo
+            totalDifficulty = (tempo*difficulty);
             state = PLAY;
             break;
         }
 
         case PLAY:
         {
-            //Implement demo mode!
 
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
-            char buttonPress = getButtons();
-            char correctLED  = ((songList[song].smlSpeaker[noteTwo].pitch % 4)+1);
+            char buttonPress = getButtons();    //Get player input from buttons
+            char correctLED  = ((songList[song].smlSpeaker[noteTwo].pitch % 4)+1);  //(Note index%4)+1 is the value of what button the player should press
             if(songList[song].smlSpeaker[noteTwo].pitch == REST)
                 correctLED = 0;
 
@@ -269,27 +271,23 @@ void main(void)
                 noteTwo++;
                 sixteenthsPassedTwo = loc_sixteenths_two;
                 BuzzerOff();
-                buttonPress = getButtons();
-                /*
-                if(buttonPress != correctLED)
-                    totalWrongNotes++;
+                //buttonPress = getButtons();
+/*
+                if(!demo)   //Only count mispresses if the game is not in a demo.
+                {
+                    if(buttonPress != correctLED)
+                        totalWrongNotes++;
+                }
 */
             }
 
-            if((noteOne >= songList[song].bigSpeakerCount) | (noteTwo >= songList[song].smlSpeakerCount))   //If song is over
-            {
-                BuzzerOffTwo();
-                state = WIN;
-            }
+            //if((noteOne >= songList[song].bigSpeakerCount) | (noteTwo >= songList[song].smlSpeakerCount))   //If song is over
+              //  state = WIN;            //If song is over, player wins
 
-            if(getKey() == '#')
+            if(getKey() == '#')         //Quit game if necessary
                 state = QUIT;
 
-
-
-
-
-            if(totalWrongNotes >= 15)
+            if(totalWrongNotes >= 20)   //End game if player loses
             {
                 state = LOSE;
                 break;
@@ -383,7 +381,7 @@ void main(void)
 void playNote(Note* note)
 {
     BuzzerOnFreq(note->pitch);
-    setLeds(note->pitch);
+    setLeds(((note->pitch)%4)+1);
 }
 
 void playNoteTwo(Note* note)
@@ -406,6 +404,11 @@ void resetGlobals(void)
     demo = 0;
 }
 
+void pressButtons(void)
+{
+    char foo = getButtons();
+    setLeds(foo);
+}
 
 
 

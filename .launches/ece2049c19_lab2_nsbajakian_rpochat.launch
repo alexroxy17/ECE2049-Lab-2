@@ -6,6 +6,7 @@
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.C:\Users\Administrator\Desktop\Workspace\ece2049c19_lab2_nsbajakian_rpochat\targetConfigs\MSP430F5529.ccxml.TI MSP430 USB1/MSP430" value="ece2049c19_lab2_nsbajakian_rpochat"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_TARGET_CONFIG" value="${target_config_active_default:ece2049c19_lab2_nsbajakian_rpochat}"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.C:\Users\Administrator\Desktop\Workspace\ece2049c19_lab2_nsbajakian_rpochat\targetConfigs\MSP430F5529.ccxml.TI MSP430 USB1/MSP430" value="C:/Users\Administrator\Desktop\Workspace\ece2049c19_lab2_nsbajakian_rpochat\Debug\ece2049c19_lab2_nsbajakian_rpochat.out"/>
+<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.TI MSP430 USB1/MSP430" value="C:/Users\Nathaniel Bajakian\Desktop\Local Workspace\ece2049c19_lab2_nsbajakian_rpochat\Debug\ece2049c19_lab2_nsbajakian_rpochat.out"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/ece2049c19_lab2_nsbajakian_rpochat"/>
 </listAttribute>

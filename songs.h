@@ -31,7 +31,7 @@ Song tetris = {
                tetrisBass,
                tetrisTreble,
                18,
-               1,
+               0,
                352,
                311
 };
@@ -50,7 +50,7 @@ Song songOfStorms = {
                      18,
                      0,
                      230,
-                     230      //Disable playback for small speaker
+                     230      //Disable playback for small speaker by duplicating it
 };
 
 Song interstellar = {
