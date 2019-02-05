@@ -10,20 +10,20 @@
 #include "songs.h"
 
 
-typedef enum {WELCOME,MENU,MENUPAGE2,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POSTQUIT, DIFFICULTYSELECT} eState;
+typedef enum {WELCOME,MENU,MENUPAGE2,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POST, DIFFICULTYSELECT} eState;
 
 
 // Function Prototypes
 void swDelay(char numLoops);
 void swDelay2(char numLoops);
-void playNote(Note* note);
+void playNote(Note* note, char ledToggle);
 void playNoteTwo(Note* note);
 void resetGlobals(void);
 void pressButtons(void);
 
 volatile unsigned int totalDifficulty = 1;
 volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0, wrongNotes = 0, totalWrongNotes=0, difficulty = 1, demo = 0;
-char tempo = 18, foo=4;    //init tempo to 165 bpm, foo to 4
+char tempo = 18, foo=4, soundEffect = 0;    //init tempo to 165 bpm, foo to 4
 
 
 #pragma vector=TIMER2_A0_VECTOR
@@ -50,6 +50,7 @@ void main(void)
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
     char song = 0;
     Song songList[5] = {gravityFalls, tetris, songOfStorms, interstellar, despacito};
+    Song effectList[2] = {lossTone, winTone};
 
     // Using msp430.h definitions
      _BIS_SR(GIE); // Global Interrupt enable VERY IMPORTANT
@@ -213,7 +214,7 @@ void main(void)
                 Graphics_drawStringCentered(&g_sContext, readyText, AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
                 Graphics_drawStringCentered(&g_sContext, countdown[i], AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
                 Graphics_flushBuffer(&g_sContext);
-                BuzzerOnFreq(NOTE_C5);
+                BuzzerOnFreq(NOTE_C6);
                 swDelay(1);
                 BuzzerOff();
                 swDelay(7);
@@ -255,7 +256,7 @@ void main(void)
             if((&songList[song].smlSpeaker[noteTwo] == REST) | (noteTwo >= songList[song].smlSpeakerCount)) //If note is a rest or song is done
                 BuzzerOff();
             else
-                playNote   (&songList[song].smlSpeaker[noteTwo]);
+                playNote   (&songList[song].smlSpeaker[noteTwo],1);
 
             durationOne = songList[song].bigSpeaker[noteOne].duration;
             durationTwo = songList[song].smlSpeaker[noteTwo].duration;
@@ -281,8 +282,8 @@ void main(void)
 */
             }
 
-            //if((noteOne >= songList[song].bigSpeakerCount) | (noteTwo >= songList[song].smlSpeakerCount))   //If song is over
-              //  state = WIN;            //If song is over, player wins
+            if((noteOne >= songList[song].bigSpeakerCount) | (noteTwo >= songList[song].smlSpeakerCount))   //If song is over
+                state = WIN;            //If song is over, player wins
 
             if(getKey() == '#')         //Quit game if necessary
                 state = QUIT;
@@ -319,7 +320,8 @@ void main(void)
                 if(currKey == '*')    //Wait for user to press * key
                     moveOn = 1;
             }
-            state = WELCOME;
+            soundEffect = 0;    //Losing sound effect
+            state = POST;
             break;
         }
 
@@ -330,21 +332,14 @@ void main(void)
             BuzzerOffTwo(); //Reset buzzers
             setLeds(REST);     //Reset LEDs
             resetGlobals(); //Reset globals
-            stopTimer();    //Stop  timer
             Graphics_drawStringCentered(&g_sContext, "YOU", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "WIN!", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "To return:", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "Press *", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);
 
-            volatile unsigned int moveOn = 0;
-            while(moveOn == 0)
-            {
-                char currKey = getKey();
-                if(currKey == '*')    //Wait for user to press * key
-                    moveOn = 1;
-            }
-            state = WELCOME;
+            soundEffect = 1;    //Winning sound effect
+            state = POST;
             break;
         }
 
@@ -361,18 +356,28 @@ void main(void)
             Graphics_drawStringCentered(&g_sContext, "To return:", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "Press *", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);
-
-            state = POSTQUIT;
+            soundEffect = 0;
+            state = POST;
         }
-        case POSTQUIT:
+        case POST:
         {
+
+
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
-            if((&lossTone.bigSpeaker[noteOne] == REST) | (noteOne >= lossTone.bigSpeakerCount)) //If note is a rest or song is done
+
+            //If rest, don't play any music
+            if((&effectList[soundEffect].bigSpeaker[noteOne] == REST) | (noteOne >= effectList[soundEffect].bigSpeakerCount)) //If note is a rest or song is done
                 BuzzerOffTwo();
             else
-                playNoteTwo(&lossTone.bigSpeaker[noteOne]); //Else, play appropriate note with appropriate power
-            durationOne = lossTone.bigSpeaker[noteOne].duration;
+                playNoteTwo(&effectList[soundEffect].bigSpeaker[noteOne]); //Else, play appropriate note with appropriate power
 
+            if((&effectList[soundEffect].smlSpeaker[noteTwo] == REST) | (noteTwo >= effectList[soundEffect].smlSpeakerCount)) //If note is a rest or song is done
+                BuzzerOff();
+            else
+                playNote   (&effectList[soundEffect].smlSpeaker[noteTwo],0);
+
+            durationOne = effectList[soundEffect].bigSpeaker[noteOne].duration;
+            durationTwo = effectList[soundEffect].smlSpeaker[noteTwo].duration;
 
             if(loc_sixteenths - sixteenthsPassed == durationOne)
             {
@@ -380,12 +385,26 @@ void main(void)
                 sixteenthsPassed = loc_sixteenths;
                 BuzzerOffTwo();
                 setLeds(foo);
-                foo--;
-                if(foo <= 0)
-                    foo = 4;
+                if(soundEffect)
+                {
+                    foo++;  //Ascending lights
+                    if(foo >= 4)
+                        foo = 1;
+                }
+                else
+                {
+                    foo--;  //Descending lights
+                    if(foo <= 0)
+                        foo = 4;
+                }
             }
-
-            if(noteOne >= lossTone.bigSpeakerCount)   //If song is over
+            if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
+            {
+                noteTwo++;
+                sixteenthsPassedTwo = loc_sixteenths_two;
+                BuzzerOff();
+            }
+            if(noteOne >= effectList[soundEffect].bigSpeakerCount)   //If song is over
             {
                 volatile unsigned int moveOn = 0;
                 while(moveOn == 0)
@@ -397,22 +416,22 @@ void main(void)
                 resetGlobals();
                 state = WELCOME;
                 stopTimer();    //Stop  timer
-
                 break;
             }
             break;
 
-        }
+        }//End post
 
         }//End switch
     }  // end while (1)
 }//End main
 
 
-void playNote(Note* note)
+void playNote(Note* note, char ledToggle)
 {
     BuzzerOnFreq(note->pitch);
-    setLeds(((note->pitch)%4)+1);
+    if(ledToggle)
+        setLeds(((note->pitch)%4)+1);
 }
 
 void playNoteTwo(Note* note)
@@ -433,6 +452,8 @@ void resetGlobals(void)
     durationTwo = 0;
     totalWrongNotes = 0;
     demo = 0;
+    foo = 4;
+    soundEffect = 0;
 }
 
 void pressButtons(void)

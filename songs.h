@@ -73,12 +73,21 @@ Song despacito = {
 };
 
 Song lossTone = {
-                 loss,
-                 loss,
+                 lossTreble,
+                 lossBass,
                  18,
                  0,
                  24,
-                 24
+                 25
+};
+
+Song winTone = {
+                winTreble,
+                winBass,
+                30,
+                0,
+                31,
+                30
 };
 
 
