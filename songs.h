@@ -18,6 +18,7 @@
 #include "despacito.h"
 #include "miscSounds.h"
 #include "got.h"
+#include "aquaVitae.h"
 
 typedef struct {
     const Note* bigSpeaker;                   //What notepattern to play on the large speaker
@@ -101,11 +102,21 @@ const Song lossTone = {
 const Song winTone = {
                 winTreble,
                 winBass,
-                30,
+                20,//down from 30
                 0,
                 1,
                 31,
                 30
+};
+
+const Song aquaVitae = {
+                        aquaVitaeTreb,
+                        aquaVitaeTreb,
+                        18,
+                        1,
+                        1,
+                        565,
+                        565
 };
 
 

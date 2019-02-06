@@ -54,7 +54,7 @@ void main(void)
     eState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
     unsigned char song = 0;
-    const Song songList[6] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa};
+    const Song songList[6] = {aquaVitae, tetris, gameOfThrones, interstellar, despacito, mhysa};
     const Song effectList[2] = {lossTone, winTone};
 
     // Using msp430.h definitions
