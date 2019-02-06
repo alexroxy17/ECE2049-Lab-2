@@ -72,7 +72,7 @@ void setLeds(unsigned char state);
 void initButtons(void);
 char getButtons(void);
 
-void configureUserLED(char inbits);
+void userLEDs(char inbits);
 
 void configDisplay(void);
 void BuzzerOnFreq(int freq);

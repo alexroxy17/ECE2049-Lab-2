@@ -82,14 +82,14 @@ char getButtons(void)
         return 0;
 }
 
-void configureUserLED(char inbits)
+void userLEDs(char inbits)
 {
     P1SEL &= ~(BIT0); //Select LED1 for I/O
     P4SEL &= ~(BIT7); //Select LED2 for I/O
 
     P1DIR |=  (BIT0); //Select LED1 for output
     P4DIR |=  (BIT7); //Select LED2 for output
-    inbits--;
+    //inbits--;
     //inbits &= (BIT0|BIT1); //Mask inbits to only two LSB
 
     switch(inbits)

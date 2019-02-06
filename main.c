@@ -14,10 +14,9 @@ typedef enum {WELCOME,MENU,MENUPAGE2,GOTSELECT,DIFFICULTYSELECT,COUNTDOWN, PLAY,
 
 
 // Function Prototypes
-void swDelay(char numLoops);
-void swDelay2(char numLoops);
-void playNote(Note* note, char ledToggle);
-void playNoteTwo(Note* note);
+void swDelay(char waitTime);
+void playNote(const Note* note, char ledToggle);
+void playNoteTwo(const Note* note);
 void resetGlobals(void);
 void pressButtons(void);
 
@@ -55,7 +54,7 @@ void main(void)
     eState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
     unsigned char song = 0;
-    const Song songList[5] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa};
+    const Song songList[6] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa};
     const Song effectList[2] = {lossTone, winTone};
 
     // Using msp430.h definitions
@@ -249,14 +248,16 @@ void main(void)
                 Graphics_drawStringCentered(&g_sContext, countdown[i], AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
                 Graphics_flushBuffer(&g_sContext);
                 BuzzerOnFreq(NOTE_C6);
+                userLEDs(3-i);
                 swDelay(1);
                 BuzzerOff();
-                swDelay(7);
+                swDelay(1);
             }
             Graphics_clearDisplay(&g_sContext);
-
+            userLEDs(3);
+            Graphics_drawStringCentered(&g_sContext, "GO!", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "Press # to", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
-            Graphics_drawStringCentered(&g_sContext, "exit", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "quit", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);
 
 
@@ -274,7 +275,7 @@ void main(void)
 
         case PLAY:
         {
-
+            userLEDs(0);
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
             char buttonPress = getButtons();    //Get player input from buttons
             char correctLED  = ((songList[song].smlSpeaker[noteTwo].pitch % 4)+1);  //(Note index%4)+1 is the value of what button the player should press
@@ -461,7 +462,7 @@ void main(void)
 }//End main
 
 
-void playNote(Note* note, char ledToggle)
+void playNote(const Note* note, char ledToggle)
 {
     BuzzerOnFreq(note->pitch);
     if(ledToggle)
@@ -473,7 +474,7 @@ void playNote(Note* note, char ledToggle)
     }
 }
 
-void playNoteTwo(Note* note)
+void playNoteTwo(const Note* note)
 {
     BuzzerOnFreqTwo(note->pitch);
 }
@@ -503,7 +504,7 @@ void pressButtons(void)
 
 
 
-void swDelay(char numLoops)
+void swDelay(char waitTime)
 {
     // This function is a software delay. It performs
     // useless loops to waste a bit of time
@@ -513,32 +514,25 @@ void swDelay(char numLoops)
     //
     // smj, ECE2049, 25 Aug 2013
 
+    volatile unsigned int loc_sixteenths = sixteenths; //sixteenths arises from the global interrupts
+
+    totalDifficulty = 30;//Set to 100bpm
+    unsigned int bar = loc_sixteenths + (waitTime*4);
+    unsigned char flag = 1;
+
+    while(flag)
+        if(bar == sixteenths)
+            flag = 0;
+
+    resetGlobals();
+    /*
+
     volatile unsigned int i,j;  // volatile to prevent removal in optimization
                                 // by compiler. Functionally this is useless code
-    for (j=0; j<numLoops; j++)
+    for (j=0; j<numSeconds; j++)
     {
         i = 10000 ;     // SW Delay
         while (i > 0)   // could also have used while (i)
            i--;
-    }
-}
-void swDelay2(char numLoops)
-{
-    // This function is a software delay. It performs
-    // useless loops to waste a bit of time. Less time than
-    // swDelay.
-    //
-    // Input: numLoops = number of delay loops to execute
-    // Output: none
-    //
-    // nsb, ECE2049, 22 Jan 2019
-
-    volatile unsigned int i,j;
-
-    for (j=0; j<numLoops; j++)
-    {
-        i = 100 ;                   // SW Delay
-        while (i > 0)               // could also have used while (i)
-           i--;
-    }
+    }*/
 }

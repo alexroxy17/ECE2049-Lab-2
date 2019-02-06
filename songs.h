@@ -24,8 +24,9 @@ typedef struct {
     const Note* smlSpeaker;                   //What notepattern to play on the small speaker
     char tempo;                         //Tempo to play at. 18=165 bpm, 30 = 100bpm
     char power:1;                       //What power the large speaker should play at. Only need 1 bit: 0 or 1.
-    unsigned int bigSpeakerCount;     //Number of notes for the large speaker. Only need 9 bits.
-    unsigned int smlSpeakerCount;    //Number of notes for the small speaker. Only need 9 bits.
+    char legacy:1;
+    unsigned int bigSpeakerCount;
+    unsigned int smlSpeakerCount;
 } Song;
 
 const Song tetris = {
@@ -33,6 +34,7 @@ const Song tetris = {
                tetrisTreble,
                18,
                0,
+               1,
                352,
                311
 };
@@ -42,6 +44,7 @@ const Song gravityFalls = {
                      gravityFallsTreble,
                      18,
                      0,
+                     1,
                      184,
                      75
 };
@@ -49,6 +52,7 @@ const Song mhysa = {
                      mhysaTreb,
                      mhysaBass,
                      40,
+                     1,
                      1,
                      320,
                      390
@@ -59,6 +63,7 @@ const Song gameOfThrones = {
                             gotBass,
                             18,
                             1,
+                            1,
                             296,
                             224
 };
@@ -68,6 +73,7 @@ const Song interstellar = {
                      interstellarTreble,
                      30,
                      0,
+                     1,
                      214,
                      546
 };
@@ -77,6 +83,7 @@ const Song despacito = {
                      despacitoBass,
                      17,
                      0,
+                     1,
                      438,
                      353
 };
@@ -86,6 +93,7 @@ const Song lossTone = {
                  lossBass,
                  18,
                  0,
+                 1,
                  24,
                  25
 };
@@ -95,6 +103,7 @@ const Song winTone = {
                 winBass,
                 30,
                 0,
+                1,
                 31,
                 30
 };
