@@ -48,9 +48,9 @@ void main(void)
     //initButtons();    //Configure buttons
     eState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
-    char song = 0;
-    Song songList[5] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito};
-    Song effectList[2] = {lossTone, winTone};
+    unsigned char song = 0;
+    const Song songList[5] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito};
+    const Song effectList[2] = {lossTone, winTone};
 
     // Using msp430.h definitions
      _BIS_SR(GIE); // Global Interrupt enable VERY IMPORTANT
@@ -362,7 +362,7 @@ void main(void)
         case POST:
         {
 
-
+            totalDifficulty = 18;
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
 
             //If rest, don't play any music

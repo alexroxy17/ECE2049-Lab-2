@@ -9,7 +9,7 @@
 #define DESPACITO_H_
 #include "notes.h"
 
-Note despacitoTreble[] = {
+const Note despacitoTreble[] = {
                              {Fs4,1},
                              {A4,1},
                              {D5,4},
@@ -538,7 +538,7 @@ Note despacitoTreble[] = {
 };
 
 
-Note despacitoBass[] = {
+const Note despacitoBass[] = {
                         {REST,16},
 
                         {B2,4},

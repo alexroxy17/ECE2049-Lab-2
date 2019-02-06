@@ -9,7 +9,7 @@
 #define SONGS_H_
 
 
-#include "got.h"
+#include "mhysa.h"
 #include "notes.h"
 #include "gravityfalls.h"
 #include "takemehome.h"
@@ -19,15 +19,15 @@
 #include "miscSounds.h"
 
 typedef struct {
-    Note* bigSpeaker;                   //What notepattern to play on the large speaker
-    Note* smlSpeaker;                   //What notepattern to play on the small speaker
+    const Note* bigSpeaker;                   //What notepattern to play on the large speaker
+    const Note* smlSpeaker;                   //What notepattern to play on the small speaker
     char tempo;                         //Tempo to play at. 18=165 bpm, 30 = 100bpm
     char power:1;                       //What power the large speaker should play at. Only need 1 bit: 0 or 1.
     unsigned int bigSpeakerCount;     //Number of notes for the large speaker. Only need 9 bits.
     unsigned int smlSpeakerCount;    //Number of notes for the small speaker. Only need 9 bits.
 } Song;
 
-Song tetris = {
+const Song tetris = {
                tetrisBass,
                tetrisTreble,
                18,
@@ -36,7 +36,7 @@ Song tetris = {
                311
 };
 
-Song gravityFalls = {
+const Song gravityFalls = {
                      gravityFallsBass,
                      gravityFallsTreble,
                      18,
@@ -44,16 +44,16 @@ Song gravityFalls = {
                      184,
                      75
 };
-Song gameOfThrones = {
-                     gotTreb,
-                     gotBass,  //Repeat, since there is no bass line (yet)
-                     18,
-                     0,
-                     296,
-                     224      //Disable playback for small speaker by duplicating it
+const Song gameOfThrones = {
+                     mhysaTreb,
+                     mhysaBass,  //Repeat, since there is no bass line (yet)
+                     40,
+                     1,
+                     298,
+                     312      //Disable playback for small speaker by duplicating it
 };
 
-Song interstellar = {
+const Song interstellar = {
                      interstellarBass,
                      interstellarTreble,
                      30,
@@ -62,7 +62,7 @@ Song interstellar = {
                      546
 };
 
-Song despacito = {
+const Song despacito = {
                      despacitoTreble,
                      despacitoBass,
                      17,
@@ -71,7 +71,7 @@ Song despacito = {
                      353
 };
 
-Song lossTone = {
+const Song lossTone = {
                  lossTreble,
                  lossBass,
                  18,
@@ -80,7 +80,7 @@ Song lossTone = {
                  25
 };
 
-Song winTone = {
+const Song winTone = {
                 winTreble,
                 winBass,
                 30,

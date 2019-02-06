@@ -9,7 +9,7 @@
 #define INTERSTELLAR_H_
 #include "notes.h"
 
-Note interstellarTreble[] = {
+const Note interstellarTreble[] = {
 
                              {NOTE_E4,2},
                              {NOTE_C4,2},
@@ -640,7 +640,7 @@ Note interstellarTreble[] = {
 };
 
 
-Note interstellarBass[] = {
+const Note interstellarBass[] = {
                              {REST,12},
 
                              {REST,12},

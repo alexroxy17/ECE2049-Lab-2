@@ -10,7 +10,7 @@
 #define GOT_H_
 #include "notes.h"
 
-Note gotTreb [] = {
+const Note gotTreb [] = {
 
                     /*  SIXTEEN = 1; EIGHT = 2; FOURTH = 4; HALF = 8; FULL = 16*///******************** Line 41 ********************//
 
@@ -325,7 +325,7 @@ Note gotTreb [] = {
 
     };
 
-Note gotBass [] = {
+const Note gotBass [] = {
 
                    {G2,23},//
                    {REST,1},//

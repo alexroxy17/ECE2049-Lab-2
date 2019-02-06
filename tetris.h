@@ -9,7 +9,7 @@
 #define TETRIS_H_
 //Treble: 311
 //Bass: 352
-Note tetrisTreble[] = {
+const Note tetrisTreble[] = {
 
                      {NOTE_E5,4},
                      {NOTE_B4,2},
@@ -378,7 +378,7 @@ Note tetrisTreble[] = {
                      {NOTE_A5, 8},
 };
 
-Note tetrisBass[] = {
+const Note tetrisBass[] = {
 
                      {NOTE_B3,2},
                      {NOTE_E4,2},
