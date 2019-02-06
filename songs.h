@@ -17,6 +17,7 @@
 #include "interstellar.h"
 #include "despacito.h"
 #include "miscSounds.h"
+#include "got.h"
 
 typedef struct {
     const Note* bigSpeaker;                   //What notepattern to play on the large speaker
@@ -44,13 +45,22 @@ const Song gravityFalls = {
                      184,
                      75
 };
-const Song gameOfThrones = {
+const Song mhysa = {
                      mhysaTreb,
-                     mhysaBass,  //Repeat, since there is no bass line (yet)
+                     mhysaBass,
                      40,
                      1,
-                     298,
-                     312      //Disable playback for small speaker by duplicating it
+                     320,
+                     390
+};
+
+const Song gameOfThrones = {
+                            gotTreb,
+                            gotBass,
+                            18,
+                            1,
+                            296,
+                            224
 };
 
 const Song interstellar = {

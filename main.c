@@ -10,7 +10,7 @@
 #include "songs.h"
 
 
-typedef enum {WELCOME,MENU,MENUPAGE2,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POST, DIFFICULTYSELECT} eState;
+typedef enum {WELCOME,MENU,MENUPAGE2,GOTSELECT,DIFFICULTYSELECT,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POST} eState;
 
 
 // Function Prototypes
@@ -34,6 +34,12 @@ __interrupt void TimerA2_ISR(void)
         sixteenths++;
 }
 
+#define GFALLS 0
+#define TETRIS 1
+#define GOTBAS 2
+#define INTERS 3
+#define DESPAC 4
+#define MHYSAS 5
 
 /******************************MAIN FUNCTION*******************************/
 void main(void)
@@ -49,7 +55,7 @@ void main(void)
     eState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
     unsigned char song = 0;
-    const Song songList[5] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito};
+    const Song songList[5] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa};
     const Song effectList[2] = {lossTone, winTone};
 
     // Using msp430.h definitions
@@ -108,17 +114,17 @@ void main(void)
                 currKey = getKey();
                 if(currKey == '1')  //Query for 1 key, WAIT FOR INPUT
                 {
-                    song = 0,state = DIFFICULTYSELECT,moveOn = 1;
+                    song = GFALLS,state = DIFFICULTYSELECT,moveOn = 1;
                     break;
                 }
                 if(currKey == '2')  //Query for 2 key, WAIT FOR INPUT
                 {
-                    song = 1,state = DIFFICULTYSELECT,moveOn = 1;
+                    song = TETRIS,state = DIFFICULTYSELECT,moveOn = 1;
                     break;
                 }
                 if(currKey == '3')  //Query for 3 key, WAIT FOR INPUT
                 {
-                    song = 2,state = DIFFICULTYSELECT,moveOn = 1;
+                    state = GOTSELECT,moveOn = 1;
                     break;
                 }
                 if(currKey == '#')  //Query for pound key, WAIT FOR INPUT
@@ -149,9 +155,37 @@ void main(void)
             {
                 currKey = getKey();
                 if(currKey == '1')  //Query for 1 key, WAIT FOR INPUT
-                    song = 3,state = DIFFICULTYSELECT,moveOn = 1;
+                    song = INTERS,state = DIFFICULTYSELECT,moveOn = 1;
                 if(currKey == '2')  //Query for star key, WAIT FOR INPUT
-                    song = 4,state = DIFFICULTYSELECT,moveOn = 1;
+                    song = DESPAC,state = DIFFICULTYSELECT,moveOn = 1;
+                if(currKey == '*')  //Query for star key, WAIT FOR INPUT
+                    state = MENU,moveOn = 1;
+            }
+            break;
+        }
+
+        case GOTSELECT:
+        {
+            Graphics_clearDisplay(&g_sContext); // Clear the display
+            Graphics_drawRectangle(&g_sContext, &box);
+            Graphics_drawStringCentered(&g_sContext, "Choose your", AUTO_STRING_LENGTH, 48, 10, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "GoT Variant:", AUTO_STRING_LENGTH, 48, 20, TRANSPARENT_TEXT);
+
+            Graphics_drawStringCentered(&g_sContext, "1:Main Theme", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "2:Mhysa", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "Press * for", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "previous page", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
+            Graphics_flushBuffer(&g_sContext);  //Draw to display
+
+            volatile unsigned int moveOn = 0;   //Wait flag
+            char currKey;                       //Holds current key
+            while(moveOn == 0)
+            {
+                currKey = getKey();
+                if(currKey == '1')  //Query for 1 key, WAIT FOR INPUT
+                    song = GOTBAS,state = DIFFICULTYSELECT,moveOn = 1;
+                if(currKey == '2')  //Query for 2 key, WAIT FOR INPUT
+                    song = MHYSAS,state = DIFFICULTYSELECT,moveOn = 1;
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     state = MENU,moveOn = 1;
             }
