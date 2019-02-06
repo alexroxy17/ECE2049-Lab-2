@@ -515,15 +515,15 @@ void swDelay(char waitTime)
     //
     // nsb, ECE2049, 06 Feb 2019
 
-    volatile unsigned int loc_sixteenths = sixteenths; //sixteenths arises from the global interrupts
+    volatile unsigned int loc_sixteenths = sixteenths;      //sixteenths arises from the global interrupts. Use this to ensure that goalTime doesn't change.
+    unsigned int goalTime = loc_sixteenths + (waitTime*4);  //Goal time to reach
+    unsigned char flag = 1; //Flag for loop
 
-    totalDifficulty = 30;//Set to 100bpm
-    unsigned int bar = loc_sixteenths + (waitTime*4);
-    unsigned char flag = 1;
+    totalDifficulty = 30;//Set timer to 100bpm
 
     while(flag)
-        if(bar == sixteenths)
-            flag = 0;
+        if(goalTime == sixteenths)
+            flag = 0; //Wait for time to pass, then exit loop.
 
     resetGlobals();
 }
