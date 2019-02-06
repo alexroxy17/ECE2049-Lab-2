@@ -9,7 +9,7 @@
 #define SONGS_H_
 
 
-#include <got.h>
+#include "got.h"
 #include "notes.h"
 #include "gravityfalls.h"
 #include "takemehome.h"
