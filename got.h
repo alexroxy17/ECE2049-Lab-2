@@ -6,8 +6,8 @@
  */
 
 
-#ifndef SONGOFSTORMS_H_
-#define SONGOFSTORMS_H_
+#ifndef GOT_H_
+#define GOT_H_
 #include "notes.h"
 
 Note gotTreb [] = {
@@ -566,4 +566,4 @@ Note gotBass [] = {
 };
 
 
-#endif /* SONGOFSTORMS_H_ */
+#endif /* GOT_H_ */
