@@ -507,12 +507,13 @@ void pressButtons(void)
 void swDelay(char waitTime)
 {
     // This function is a software delay. It performs
-    // useless loops to waste a bit of time
+    // useless loops and looks at the counter to determine
+    // if a required amount of time has passed.
     //
-    // Input: numLoops = number of delay loops to execute
+    // Input: waitTime = number of half seconds to wait
     // Output: none
     //
-    // smj, ECE2049, 25 Aug 2013
+    // nsb, ECE2049, 06 Feb 2019
 
     volatile unsigned int loc_sixteenths = sixteenths; //sixteenths arises from the global interrupts
 
@@ -525,14 +526,4 @@ void swDelay(char waitTime)
             flag = 0;
 
     resetGlobals();
-    /*
-
-    volatile unsigned int i,j;  // volatile to prevent removal in optimization
-                                // by compiler. Functionally this is useless code
-    for (j=0; j<numSeconds; j++)
-    {
-        i = 10000 ;     // SW Delay
-        while (i > 0)   // could also have used while (i)
-           i--;
-    }*/
 }
