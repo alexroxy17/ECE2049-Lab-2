@@ -41,13 +41,13 @@ const Song tetris = {
 };
 
 const Song gravityFalls = {
-                     gravityFallsBass,
                      gravityFallsTreble,
+                     gravityFallsBass,
                      18,
                      0,
                      1,
-                     184,
-                     75
+                     75,
+                     184
 };
 const Song mhysa = {
                      mhysaTreb,
@@ -73,7 +73,7 @@ const Song interstellar = {
                      interstellarBass,
                      interstellarTreble,
                      30,
-                     0,
+                     1,
                      1,
                      214,
                      546
@@ -112,7 +112,7 @@ const Song winTone = {
 const Song aquaVitae = {
                         aquaVitaeTreb,
                         aquaVitaeTreb,
-                        18,
+                        24,//22 = 135BPM, 23 = 131.5BPM,
                         1,
                         1,
                         565,

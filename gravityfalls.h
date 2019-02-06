@@ -8,7 +8,7 @@
 #ifndef GRAVITYFALLS_H_
 #define GRAVITYFALLS_H_
 
-Note gravityFallsTreble[] = { //75 Notes
+const Note gravityFallsTreble[] = { //75 Notes
 
                              {REST, 64}, //First row, no music
 
@@ -110,7 +110,7 @@ Note gravityFallsTreble[] = { //75 Notes
                              {NOTE_D7, 8}
 };
 
-Note gravityFallsBass[] = { //184 notes
+const Note gravityFallsBass[] = { //184 notes
 
                            {NOTE_F4, 2},
                            {NOTE_D4, 2},

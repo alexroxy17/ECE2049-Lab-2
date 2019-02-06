@@ -23,6 +23,8 @@ void pressButtons(void);
 volatile unsigned int totalDifficulty = 1;
 volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0, wrongNotes = 0, totalWrongNotes=0, difficulty = 1, demo = 0;
 char tempo = 18, foo=4, soundEffect = 0;    //init tempo to 165 bpm, foo to 4
+char correctButtonPress = 0;
+char wrongButtonBress = 0;
 
 
 #pragma vector=TIMER2_A0_VECTOR
@@ -39,6 +41,7 @@ __interrupt void TimerA2_ISR(void)
 #define INTERS 3
 #define DESPAC 4
 #define MHYSAS 5
+#define AQUAVI 6
 
 /******************************MAIN FUNCTION*******************************/
 void main(void)
@@ -50,11 +53,11 @@ void main(void)
     initLeds();       //Initialize LEDs
     configDisplay();  //Configure 96x96 display
     configKeypad();   //Configure keypad
-    //initButtons();    //Configure buttons
+    initButtons();    //Configure buttons
     eState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
     unsigned char song = 0;
-    const Song songList[6] = {aquaVitae, tetris, gameOfThrones, interstellar, despacito, mhysa};
+    const Song songList[7] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa, aquaVitae};
     const Song effectList[2] = {lossTone, winTone};
 
     // Using msp430.h definitions
@@ -96,7 +99,7 @@ void main(void)
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
             Graphics_drawRectangle(&g_sContext, &box);
-            Graphics_drawStringCentered(&g_sContext, "MENU: Choose a", AUTO_STRING_LENGTH, 48, 10, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "MENUU: Choose a", AUTO_STRING_LENGTH, 48, 10, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "song with 1-3", AUTO_STRING_LENGTH, 48, 20, TRANSPARENT_TEXT);
 
             Graphics_drawStringCentered(&g_sContext, "1:Grav. Falls", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
@@ -144,6 +147,7 @@ void main(void)
 
             Graphics_drawStringCentered(&g_sContext, "1:Interstellar", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "2:Despacito", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "3:Aqua Vitae", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "Press * for", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "previous page", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);  //Draw to display
@@ -157,6 +161,8 @@ void main(void)
                     song = INTERS,state = DIFFICULTYSELECT,moveOn = 1;
                 if(currKey == '2')  //Query for star key, WAIT FOR INPUT
                     song = DESPAC,state = DIFFICULTYSELECT,moveOn = 1;
+                if(currKey == '2')  //Query for star key, WAIT FOR INPUT
+                    song = AQUAVI,state = DIFFICULTYSELECT,moveOn = 1;
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     state = MENU,moveOn = 1;
             }
@@ -261,7 +267,7 @@ void main(void)
             Graphics_flushBuffer(&g_sContext);
 
 
-            resetGlobals();
+            //resetGlobals();
             if(songList[song].power)
                 P1DS |=  BIT2;              //High drive strength
             else
@@ -270,17 +276,44 @@ void main(void)
             tempo = songList[song].tempo;   //Set correct song tempo
             totalDifficulty = (tempo*difficulty);
             state = PLAY;
+            userLEDs(0);
             break;
         }
 
         case PLAY:
         {
-            userLEDs(0);
+
+
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
-            char buttonPress = getButtons();    //Get player input from buttons
             char correctLED  = ((songList[song].smlSpeaker[noteTwo].pitch % 4)+1);  //(Note index%4)+1 is the value of what button the player should press
+            switch(correctLED)
+            {
+            case 1:
+                correctLED = BIT0;
+                break;
+            case 2:
+                correctLED = BIT1;
+                break;
+            case 3:
+                correctLED = BIT2;
+                break;
+            case 4:
+                correctLED = BIT3;
+                break;
+            }
+
+
+            char currButton = getButtons();
+
+
+
+
+
+
             if(songList[song].smlSpeaker[noteTwo].pitch == REST)
                 correctLED = 0;
+            if(correctLED & currButton)
+                correctButtonPress = 1;
 
             //If rest, don't play any music
             if((&songList[song].bigSpeaker[noteOne] == REST) | (noteOne >= songList[song].bigSpeakerCount)) //If note is a rest or song is done
@@ -307,6 +340,16 @@ void main(void)
                 noteTwo++;
                 sixteenthsPassedTwo = loc_sixteenths_two;
                 BuzzerOff();
+
+                if(!demo && correctButtonPress != 1)
+                {
+                    totalWrongNotes++;
+                    userLEDs(1);//Red LED
+                }
+                else
+                    userLEDs(2);//Correct
+                correctButtonPress = 0;
+
                 //buttonPress = getButtons();
 /*
                 if(!demo)   //Only count mispresses if the game is not in a demo.
@@ -323,7 +366,7 @@ void main(void)
             if(getKey() == '#')         //Quit game if necessary
                 state = QUIT;
 
-            if(totalWrongNotes >= 20)   //End game if player loses
+            if((demo != 1) && (totalWrongNotes >= 2))   //End game if player loses
             {
                 state = LOSE;
                 break;
@@ -398,6 +441,7 @@ void main(void)
         {
 
             totalDifficulty = 18;
+            /*
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
 
             //If rest, don't play any music
@@ -439,8 +483,9 @@ void main(void)
                 sixteenthsPassedTwo = loc_sixteenths_two;
                 BuzzerOff();
             }
-            if(noteOne >= effectList[soundEffect].bigSpeakerCount)   //If song is over
-            {
+            */
+            //if(noteOne >= effectList[soundEffect].bigSpeakerCount)   //If song is over
+           // {
                 volatile unsigned int moveOn = 0;
                 while(moveOn == 0)
                 {
@@ -452,8 +497,8 @@ void main(void)
                 state = WELCOME;
                 stopTimer();    //Stop  timer
                 break;
-            }
-            break;
+            //}
+            //break;
 
         }//End post
 
@@ -491,7 +536,7 @@ void resetGlobals(void)
     durationOne = 0;
     durationTwo = 0;
     totalWrongNotes = 0;
-    demo = 0;
+    //demo = 0;
     foo = 4;
     soundEffect = 0;
 }

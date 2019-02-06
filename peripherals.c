@@ -62,7 +62,7 @@ char getButtons(void)
 {
     //  S1   S2   S3   S4
     //  7.0  3.6  2.2  7.4
-    char s1=0,s2=0,s3=0,s4=0;
+    char s1=0,s2=0,s3=0,s4=0,ret=0x00;
 
     s1 = (~P7IN & BIT0);    //s1 is 1 if P7.0 is 0
     s2 = (~P3IN & BIT6);    //button is pressed if value is zero!
@@ -71,15 +71,16 @@ char getButtons(void)
 
 
     if(s1)
-        return 1;
+        ret |= BIT0;
     if(s2)
-        return 2;
+        ret |= BIT1;
     if(s3)
-        return 3;
+        ret |= BIT2;
     if(s4)
-        return 4;
-    else
-        return 0;
+        ret |= BIT3;
+
+    return ret;
+
 }
 
 void userLEDs(char inbits)
