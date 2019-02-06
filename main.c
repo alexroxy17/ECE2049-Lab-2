@@ -159,9 +159,9 @@ void main(void)
                 currKey = getKey();
                 if(currKey == '1')  //Query for 1 key, WAIT FOR INPUT
                     song = INTERS,state = DIFFICULTYSELECT,moveOn = 1;
-                if(currKey == '2')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '2')  //Query for 2 key, WAIT FOR INPUT
                     song = DESPAC,state = DIFFICULTYSELECT,moveOn = 1;
-                if(currKey == '2')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '3')  //Query for 3 key, WAIT FOR INPUT
                     song = AQUAVI,state = DIFFICULTYSELECT,moveOn = 1;
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     state = MENU,moveOn = 1;
