@@ -10,7 +10,7 @@
 #include "songs.h"
 
 
-typedef enum {WELCOME,MENU,MENUPAGE2,MENUPAGE3,GOTSELECT,DIFFICULTYSELECT,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POST} eState;
+typedef enum {WELCOME,DEV,MENU,MENUPAGE2,MENUPAGE3,GOTSELECT,DIFFICULTYSELECT,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POST} eState;
 
 
 // Function Prototypes
@@ -24,7 +24,8 @@ volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,dura
 char tempo = 18, foo=4, soundEffect = 0;    //init tempo to 165 bpm, foo to 4
 char correctButtonPress = 0;
 char wrongButtonBress = 0;
-char firstWrap = 0;
+char dev_enableTones = 1;     //Dev: enable winning/losing tones
+char dev_enableCountdown = 1; //Dev: enable countdown waiting
 
 #pragma vector=TIMER2_A0_VECTOR
 __interrupt void TimerA2_ISR(void)
@@ -89,6 +90,36 @@ void main(void)
                 currKey = getKey();
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     moveOn = 1;
+                if(currKey == "#")
+                    moveOn = 1, state = DEV;
+                //pressButtons();
+            }
+            state = MENU;
+
+            break;
+        }
+        case DEV: //Dislay welcome screen
+        {
+            Graphics_clearDisplay(&g_sContext); // Clear the display
+            Graphics_drawRectangle(&g_sContext, &box);
+            Graphics_drawStringCentered(&g_sContext, "Dev Menu", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "1:Dis. tones", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "2:Dis. cntdn", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "Press # to", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "continue", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
+            Graphics_flushBuffer(&g_sContext);                                                                         //Refreshing screen
+
+            volatile unsigned int moveOn = 0;   //Wait flag
+            char currKey;                       //Holds current key
+            while(moveOn == 0)
+            {
+                currKey = getKey();
+                if(currKey == '1')  //Query for 1 key, WAIT FOR INPUT
+                    dev_enableTones = 0;
+                if(currKey == '2')  //Query for 2 key, WAIT FOR INPUT
+                    dev_enableCountdown = 0;
+                if(currKey == "#")
+                    moveOn = 1, state = MENU;
                 //pressButtons();
             }
             state = MENU;
@@ -446,10 +477,10 @@ void main(void)
         case QUIT:
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
-            speakerTwoOff();    //Reset buzzers
-            speakerOneOff(); //Reset buzzers
-            setLeds(REST);  //Reset LEDs
-            resetGlobals(); //Reset globals
+            speakerTwoOff();   //Reset buzzers
+            speakerOneOff();   //Reset buzzers
+            setLeds(REST);     //Reset LEDs
+            resetGlobals();    //Reset globals
             Graphics_drawStringCentered(&g_sContext, "GAME", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "OVER:", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "You quit!", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
