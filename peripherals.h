@@ -75,10 +75,10 @@ char getButtons(void);
 void userLEDs(char inbits);
 
 void configDisplay(void);
-void BuzzerOnFreq(int freq);
-void BuzzerOnFreqTwo(int freq);
-void BuzzerOff(void);
-void BuzzerOffTwo(void);
+void speakerTwoOnFreq(int freq);
+void speakerOneOnFreq(int freq);
+void speakerTwoOff(void);
+void speakerOneOff(void);
 
 void configKeypad(void);
 unsigned char getKey(void);

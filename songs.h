@@ -21,13 +21,13 @@
 #include "canon.h"
 
 typedef struct {
-    const Note* bigSpeaker;                   //What notepattern to play on the large speaker
-    const Note* smlSpeaker;                   //What notepattern to play on the small speaker
+    const Note* speakerOne;                   //What notepattern to play on the large speaker
+    const Note* speakerTwo;                   //What notepattern to play on the small speaker
     char tempo;                         //Tempo to play at. 18=165 bpm, 30 = 100bpm
     char power:1;                       //What power the large speaker should play at. Only need 1 bit: 0 or 1.
-    char legacy:1;
-    unsigned int bigSpeakerCount;
-    unsigned int smlSpeakerCount;
+    char legacy:1;                      //Future plan: Implement 32nd time keeping. This bit will signify if song was created using 16th timing.
+    unsigned int speakerOneCount;       //Number of notes on Speaker One (typically treble clef)
+    unsigned int speakerTwoCount;       //Number of notes on Speaker One (typically bass clef)
 } Song;
 
 const Song tetris = {
@@ -112,7 +112,7 @@ const Song winTone = {
 const Song aquaVitae = {
                         aquaVitaeTreb,
                         aquaVitaeBass,
-                        24,//22 = 135BPM, 23 = 131.5BPM,
+                        24,//Use 24
                         1,
                         1,
                         926,

@@ -971,7 +971,7 @@ const Note aquaVitaeTreb[] = {
                               {A5,1},
                               {Cs5,1},////
 
-                              {D6,4}
+                              {D6,32}
 
 
 };
@@ -1096,6 +1096,7 @@ const Note aquaVitaeBass[] = {
                               {Bb4,12},
 
                               {C4,12},
+                              {D4,28},
                               {D4,28}
 };
 

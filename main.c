@@ -18,7 +18,6 @@ void swDelay(char waitTime);
 void playNote(const Note* note, char ledToggle);
 void playNoteTwo(const Note* note);
 void resetGlobals(void);
-void pressButtons(void);
 
 volatile unsigned int totalDifficulty = 1;
 volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0, wrongNotes = 0, totalWrongNotes=0, difficulty = 1, demo = 0;
@@ -72,8 +71,8 @@ void main(void)
         case WELCOME: //Dislay welcome screen
         {
             resetGlobals();
-            BuzzerOff();
-            BuzzerOffTwo();
+            speakerTwoOff();
+            speakerOneOff();
             Graphics_clearDisplay(&g_sContext); // Clear the display
             Graphics_drawRectangle(&g_sContext, &box);
             Graphics_drawStringCentered(&g_sContext, "MSP Hero", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
@@ -284,10 +283,10 @@ void main(void)
                 Graphics_drawStringCentered(&g_sContext, readyText, AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
                 Graphics_drawStringCentered(&g_sContext, countdown[i], AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
                 Graphics_flushBuffer(&g_sContext);
-                BuzzerOnFreq(C5);
+                speakerTwoOnFreq(C5);
                 userLEDs(3-i);
                 swDelay(1);
-                BuzzerOff();
+                speakerTwoOff();
                 swDelay(1);
             }
             Graphics_clearDisplay(&g_sContext);
@@ -320,30 +319,30 @@ void main(void)
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
 
             //If rest, don't play any music
-            if((&songList[song].bigSpeaker[noteOne].pitch == REST) | (noteOne >= songList[song].bigSpeakerCount)) //If note is a rest or song is done
-                BuzzerOffTwo();
+            if((&songList[song].speakerOne[noteOne].pitch == REST) | (noteOne >= songList[song].speakerOneCount)) //If note is a rest or song is done
+                speakerOneOff();
             else
-                playNoteTwo(&songList[song].bigSpeaker[noteOne]); //Else, play appropriate note with appropriate power
+                playNoteTwo(&songList[song].speakerOne[noteOne]); //Else, play appropriate note with appropriate power
 
-            if((&songList[song].smlSpeaker[noteTwo] == REST) | (noteTwo >= songList[song].smlSpeakerCount)) //If note is a rest or song is done
-                BuzzerOff();
+            if((&songList[song].speakerTwo[noteTwo] == REST) | (noteTwo >= songList[song].speakerTwoCount)) //If note is a rest or song is done
+                speakerTwoOff();
             else
-                playNote   (&songList[song].smlSpeaker[noteTwo],1);
+                playNote   (&songList[song].speakerTwo[noteTwo],1);
 
-            durationOne = songList[song].bigSpeaker[noteOne].duration;
-            durationTwo = songList[song].smlSpeaker[noteTwo].duration;
+            durationOne = songList[song].speakerOne[noteOne].duration;
+            durationTwo = songList[song].speakerTwo[noteTwo].duration;
 
              if(loc_sixteenths - sixteenthsPassed == durationOne)
             {
                 noteOne++;
                 sixteenthsPassed = loc_sixteenths;
-                BuzzerOffTwo();
+                speakerOneOff();
             }
             if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
             {
                 noteTwo++;
                 sixteenthsPassedTwo = loc_sixteenths_two;
-                BuzzerOff();
+                speakerTwoOff();
 
                 if(!demo && correctButtonPress != 1)
                 {
@@ -353,18 +352,9 @@ void main(void)
                 else
                     userLEDs(2);//Correct
                 correctButtonPress = 0;
-
-                //buttonPress = getButtons();
-/*
-                if(!demo)   //Only count mispresses if the game is not in a demo.
-                {
-                    if(buttonPress != correctLED)
-                        totalWrongNotes++;
-                }
-*/
             }
 
-            if((noteOne >= songList[song].bigSpeakerCount) | (noteTwo >= songList[song].smlSpeakerCount))   //If song is over
+            if((noteOne >= songList[song].speakerOneCount) | (noteTwo >= songList[song].speakerTwoCount))   //If song is over
                 state = WIN;            //If song is over, player wins
 
             if(getKey() == '#')         //Quit game if necessary
@@ -372,7 +362,7 @@ void main(void)
 
             //**********Button/Game Logic**********//
 
-            char correctLED  = ((songList[song].smlSpeaker[noteTwo].pitch % 4)+1);  //(Note index%4)+1 is the value of what button the player should press
+            char correctLED  = ((songList[song].speakerTwo[noteTwo].pitch % 4)+1);  //(Note index%4)+1 is the value of what button the player should press
             switch(correctLED) //Determine what the correct LED for the current playing note is
             {
             case 1:
@@ -388,11 +378,20 @@ void main(void)
                 correctLED = BIT3;
                 break;
             }
-            if(songList[song].smlSpeaker[noteTwo].pitch == REST) //If rest, the correct note to play is nothing
+            if(songList[song].speakerTwo[noteTwo].pitch == REST) //If rest, the correct note to play is nothing
                 correctLED = 0;
             char currButton = getButtons(); //Get the button the player is currently pressing
             if(correctLED & currButton)
                 correctButtonPress = 1;     //If player presses correct button in the duration of the note, this will toggle on.
+
+            if(!demo)   //Only count mispresses if the game is not in a demo.
+            {
+                if(currButton != correctLED)
+                    totalWrongNotes++;
+            }
+
+
+
             if((demo != 1) && (totalWrongNotes >= 15))   //End game if player loses
                 state = LOSE;
             break;
@@ -402,9 +401,9 @@ void main(void)
         case LOSE:
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
-            BuzzerOff();    //Reset buzzers
-            BuzzerOffTwo(); //Reset buzzers
-            setLeds(REST);     //Reset LEDs
+            speakerTwoOff();    //Reset buzzers
+            speakerOneOff(); //Reset buzzers
+            setLeds(REST);  //Reset LEDs
             resetGlobals(); //Reset globals
             stopTimer();    //Stop  timer
             Graphics_drawStringCentered(&g_sContext, "GAME", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
@@ -428,9 +427,9 @@ void main(void)
         case WIN:
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
-            BuzzerOff();    //Reset buzzers
-            BuzzerOffTwo(); //Reset buzzers
-            setLeds(REST);     //Reset LEDs
+            speakerTwoOff();    //Reset buzzers
+            speakerOneOff(); //Reset buzzers
+            setLeds(REST);  //Reset LEDs
             resetGlobals(); //Reset globals
             Graphics_drawStringCentered(&g_sContext, "YOU", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "WIN!", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
@@ -446,9 +445,9 @@ void main(void)
         case QUIT:
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
-            BuzzerOff();    //Reset buzzers
-            BuzzerOffTwo(); //Reset buzzers
-            setLeds(REST);     //Reset LEDs
+            speakerTwoOff();    //Reset buzzers
+            speakerOneOff(); //Reset buzzers
+            setLeds(REST);  //Reset LEDs
             resetGlobals(); //Reset globals
             Graphics_drawStringCentered(&g_sContext, "GAME", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "OVER:", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
@@ -531,14 +530,16 @@ void main(void)
 
 void playNote(const Note* note, char toggle)
 {
-    BuzzerOnFreq(note->pitch);
+    speakerTwoOnFreq(note->pitch);
     if((note->pitch)!=REST)
-        setLeds(((note->pitch)%4)+1);
+        setLeds(((note->pitch)%4)+1); //If current note isn't a rest, then display LEDs.
+    else
+        setLeds(0);                   //Else, ensure that LEDs are blank.
 }
 
 void playNoteTwo(const Note* note)
 {
-    BuzzerOnFreqTwo(note->pitch);
+    speakerOneOnFreq(note->pitch);
 }
 
 void resetGlobals(void)
@@ -557,14 +558,6 @@ void resetGlobals(void)
     foo = 4;
     soundEffect = 0;
 }
-
-void pressButtons(void)
-{
-    char foo = getButtons();
-    setLeds(foo);
-}
-
-
 
 void swDelay(char waitTime)
 {

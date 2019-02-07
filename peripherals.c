@@ -167,12 +167,41 @@ void setLeds(unsigned char state)
 }
 
 
+
+/*
+ * Enable a PWM-controlled buzzer on P1.2
+ * This function makes use of TimerA0.
+ */
+void speakerOneOnFreq(int freq)
+{
+    unsigned int actFreq = allFrequencies[freq];
+    if(actFreq > 20) //If the current note is not a rest
+    {
+        // Initialize PWM output on P1.2, which corresponds to TA0.1
+        P1SEL |= BIT2; // Select peripheral output mode for P1.2
+        P1DIR |= BIT2;
+
+        TA0CTL  = (TASSEL__ACLK|ID__1|MC__UP);  // Configure Timer B0 to use ACLK, divide by 1, up mode
+        TA0CTL  &= ~TBIE;                       // Explicitly Disable timer interrupts for safety
+
+        // Now configure the timer period, which controls the PWM period
+        TA0CCR0   = 32768 / actFreq;           // Set the PWM period in ACLK ticks
+        TA0CCTL0 &= ~CCIE;                  // Disable timer interrupts
+
+        // Configure CC register 5, which is connected to our PWM pin TB0.5
+        TA0CCTL1  = OUTMOD_7;                   // Set/reset mode for PWM
+        TA0CCTL1 &= ~CCIE;                      // Disable capture/compare interrupts
+        TA0CCR1   = TA0CCR0/2;                  // Configure a 50% duty cycle
+    }
+    else //If current note requested to play is a rest
+        speakerOneOff();
+}
+
 /*
  * Enable a PWM-controlled buzzer on P3.5
  * This function makes use of TimerB0.
  */
-
-void BuzzerOnFreq(int freq)
+void speakerTwoOnFreq(int freq)
 {
     unsigned int actFreq = allFrequencies[freq];
     if(actFreq > 20)
@@ -194,50 +223,29 @@ void BuzzerOnFreq(int freq)
         TB0CCR5   = TB0CCR0/2;                  // Configure a 50% duty cycle
     }
     else
-        BuzzerOff();
+        speakerTwoOff();
 }
 
-void BuzzerOnFreqTwo(int freq)
+/*
+ * Disable the speaker on P1.2
+ */
+void speakerOneOff(void)
 {
-    unsigned int actFreq = allFrequencies[freq];
-    if(actFreq > 20)
-    {
-        // Initialize PWM output on P1.2, which corresponds to TA0.1
-        P1SEL |= BIT2; // Select peripheral output mode for P1.2
-        P1DIR |= BIT2;
-
-        TA0CTL  = (TASSEL__ACLK|ID__1|MC__UP);  // Configure Timer B0 to use ACLK, divide by 1, up mode
-        TA0CTL  &= ~TBIE;                       // Explicitly Disable timer interrupts for safety
-
-        // Now configure the timer period, which controls the PWM period
-        TA0CCR0   = 32768 / actFreq;           // Set the PWM period in ACLK ticks
-        TA0CCTL0 &= ~CCIE;                  // Disable timer interrupts
-
-        // Configure CC register 5, which is connected to our PWM pin TB0.5
-        TA0CCTL1  = OUTMOD_7;                   // Set/reset mode for PWM
-        TA0CCTL1 &= ~CCIE;                      // Disable capture/compare interrupts
-        TA0CCR1   = TA0CCR0/2;                  // Configure a 50% duty cycle
-    }
-
-    else
-        BuzzerOffTwo();
+    TA0CCTL0 = 0;
+    TA0CCTL1 = 0;
 }
 
 /*
  * Disable the buzzer on P3.5
  */
-void BuzzerOff(void)
+void speakerTwoOff(void)
 {
     // Disable both capture/compare periods
     TB0CCTL0 = 0;
     TB0CCTL5 = 0;
 }
 
-void BuzzerOffTwo(void)
-{
-    TA0CCTL0 = 0;
-    TA0CCTL1 = 0;
-}
+
 
 
 void configKeypad(void)
