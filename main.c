@@ -299,24 +299,25 @@ void main(void)
 
             //resetGlobals();
             if(songList[song].power)
-                P1DS |=  BIT2;              //High drive strength
+                P1DS |=  BIT2;              //High drive strength - use for more stronger SpeakerOne audio.
             else
-                P1DS &= ~BIT2;              //Low drive strength
+                P1DS &= ~BIT2;              //Low drive strength - use for more balanced audio or if using piezo speaker for SpeakerOne
 
-            tempo = songList[song].tempo;   //Set correct song tempo
-            totalDifficulty = (tempo*difficulty);
-            state = PLAY;
-            userLEDs(0);
-            stopTimer();
-            runTimer();
-            count = 0;
-            sixteenths = 0;
+            tempo = songList[song].tempo;           //Set correct song tempo
+            totalDifficulty = (tempo*difficulty);   //Scale tempo to difficulty
+            state = PLAY;   //Advance to next state
+            userLEDs(0);    //Blank out LEDs
+            stopTimer();    //
+            runTimer();     //Restart timer, just in case
+            count = 0;      //Reset counter to 0, just in case
+            sixteenths = 0; //Reset sixteenths to 0, just in case
             break;
         }
 
         case PLAY:
         {
-            volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
+            volatile unsigned int instSixteenthsOne = sixteenths, instSixteenthsTwo = sixteenths; //sixteenths arises from the global interrupts.
+                                                                                                  //Capture this and ensure it doesn't change during loop execution
 
             //If rest, don't play any music
             if((&songList[song].speakerOne[noteOne].pitch == REST) | (noteOne >= songList[song].speakerOneCount)) //If note is a rest or song is done
@@ -329,28 +330,28 @@ void main(void)
             else
                 playNote   (&songList[song].speakerTwo[noteTwo],1);
 
-            durationOne = songList[song].speakerOne[noteOne].duration;
+            durationOne = songList[song].speakerOne[noteOne].duration; //Set note durations
             durationTwo = songList[song].speakerTwo[noteTwo].duration;
 
-             if(loc_sixteenths - sixteenthsPassed == durationOne)
+             if(instSixteenthsOne - sixteenthsPassed == durationOne)      //If note is over, increment note and turn speaker off
             {
                 noteOne++;
-                sixteenthsPassed = loc_sixteenths;
+                sixteenthsPassed = instSixteenthsOne;
                 speakerOneOff();
             }
-            if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
+            if(instSixteenthsTwo - sixteenthsPassedTwo == durationTwo)//If note is over, increment note and turn speaker off
             {
                 noteTwo++;
-                sixteenthsPassedTwo = loc_sixteenths_two;
+                sixteenthsPassedTwo = instSixteenthsTwo;
                 speakerTwoOff();
 
-                if(!demo && correctButtonPress != 1)
+                if(!demo && correctButtonPress != 1) //If user failed to press correct button in time
                 {
                     totalWrongNotes++;
                     userLEDs(1);//Red LED
                 }
                 else
-                    userLEDs(2);//Correct
+                    userLEDs(2);//Green LED
                 correctButtonPress = 0;
             }
 
@@ -380,11 +381,11 @@ void main(void)
             }
             if(songList[song].speakerTwo[noteTwo].pitch == REST) //If rest, the correct note to play is nothing
                 correctLED = 0;
-            char currButton = getButtons(); //Get the button the player is currently pressing
+            char currButton = getButtons(); //Get the button the player is currently pressing. This is at the end to avoid slowdowns.
             if(correctLED & currButton)
                 correctButtonPress = 1;     //If player presses correct button in the duration of the note, this will toggle on.
 
-            if(!demo)   //Only count mispresses if the game is not in a demo.
+            if(!demo)   //Only count missed presses if the game is not in a demo.
             {
                 if(currButton != correctLED)
                     totalWrongNotes++;
@@ -401,11 +402,11 @@ void main(void)
         case LOSE:
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
-            speakerTwoOff();    //Reset buzzers
-            speakerOneOff(); //Reset buzzers
-            setLeds(REST);  //Reset LEDs
-            resetGlobals(); //Reset globals
-            stopTimer();    //Stop  timer
+            speakerTwoOff();   //Reset buzzers
+            speakerOneOff();   //Reset buzzers
+            setLeds(REST);     //Reset LEDs
+            resetGlobals();    //Reset globals
+            stopTimer();       //Stop  timer
             Graphics_drawStringCentered(&g_sContext, "GAME", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "OVER", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "To return:", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
@@ -427,10 +428,10 @@ void main(void)
         case WIN:
         {
             Graphics_clearDisplay(&g_sContext); // Clear the display
-            speakerTwoOff();    //Reset buzzers
-            speakerOneOff(); //Reset buzzers
-            setLeds(REST);  //Reset LEDs
-            resetGlobals(); //Reset globals
+            speakerTwoOff();   //Reset buzzers
+            speakerOneOff();   //Reset buzzers
+            setLeds(REST);     //Reset LEDs
+            resetGlobals();    //Reset globals
             Graphics_drawStringCentered(&g_sContext, "YOU", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "WIN!", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "To return:", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
