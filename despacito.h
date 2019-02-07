@@ -10,10 +10,10 @@
 #include "notes.h"
 
 const Note despacitoTreble[] = {
-                             {Fs4,1},
+                             {Fs4,2},
                              {A4,1},
                              {D5,4},
-                             {Fs4,2},
+                             {Fs4,1},
                              {Cs5,6},
                              {Fs4,2},
 

@@ -25,7 +25,7 @@ volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,dura
 char tempo = 18, foo=4, soundEffect = 0;    //init tempo to 165 bpm, foo to 4
 char correctButtonPress = 0;
 char wrongButtonBress = 0;
-
+char firstWrap = 0;
 
 #pragma vector=TIMER2_A0_VECTOR
 __interrupt void TimerA2_ISR(void)
@@ -97,6 +97,7 @@ void main(void)
         }
         case MENU:
         {
+            resetGlobals();
             Graphics_clearDisplay(&g_sContext); // Clear the display
             Graphics_drawRectangle(&g_sContext, &box);
             Graphics_drawStringCentered(&g_sContext, "MENUU: Choose a", AUTO_STRING_LENGTH, 48, 10, TRANSPARENT_TEXT);
@@ -140,6 +141,7 @@ void main(void)
 
         case MENUPAGE2:
         {
+            resetGlobals();
             Graphics_clearDisplay(&g_sContext); // Clear the display
             Graphics_drawRectangle(&g_sContext, &box);
             Graphics_drawStringCentered(&g_sContext, "MENU: Choose a", AUTO_STRING_LENGTH, 48, 10, TRANSPARENT_TEXT);
@@ -277,6 +279,10 @@ void main(void)
             totalDifficulty = (tempo*difficulty);
             state = PLAY;
             userLEDs(0);
+            stopTimer();
+            runTimer();
+            count = 0;
+            sixteenths = 0;
             break;
         }
 
@@ -304,12 +310,6 @@ void main(void)
 
 
             char currButton = getButtons();
-
-
-
-
-
-
             if(songList[song].smlSpeaker[noteTwo].pitch == REST)
                 correctLED = 0;
             if(correctLED & currButton)
@@ -329,7 +329,7 @@ void main(void)
             durationOne = songList[song].bigSpeaker[noteOne].duration;
             durationTwo = songList[song].smlSpeaker[noteTwo].duration;
 
-            if(loc_sixteenths - sixteenthsPassed == durationOne)
+             if(loc_sixteenths - sixteenthsPassed == durationOne)
             {
                 noteOne++;
                 sixteenthsPassed = loc_sixteenths;
@@ -507,16 +507,11 @@ void main(void)
 }//End main
 
 
-void playNote(const Note* note, char ledToggle)
+void playNote(const Note* note, char toggle)
 {
     BuzzerOnFreq(note->pitch);
-    if(ledToggle)
-    {
-        if((note->pitch)!=REST)
-            setLeds(((note->pitch)%4)+1);
-        else
-            setLeds(0);
-    }
+    if((note->pitch)!=REST)
+        setLeds(((note->pitch)%4)+1);
 }
 
 void playNoteTwo(const Note* note)

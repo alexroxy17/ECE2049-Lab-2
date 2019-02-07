@@ -10,7 +10,7 @@
 
 typedef struct {
     char pitch:7;         //Note pitch. Only need 7 bits: 0-127
-    char duration:6;      //Note duration. Only need 6 bits: 0-65
+    char duration:7;      //Note duration. Only need 6 bits: 0-65
 } Note; //13 bits per note. Down from 16 bits per note, 1 byte. Down from 40 bits per note
 
 

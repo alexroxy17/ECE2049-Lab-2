@@ -44,7 +44,7 @@ const Song gravityFalls = {
                      gravityFallsTreble,
                      gravityFallsBass,
                      18,
-                     0,
+                     1,
                      1,
                      75,
                      184
@@ -83,7 +83,7 @@ const Song despacito = {
                      despacitoTreble,
                      despacitoBass,
                      17,
-                     0,
+                     1,
                      1,
                      438,
                      353
@@ -111,12 +111,12 @@ const Song winTone = {
 
 const Song aquaVitae = {
                         aquaVitaeTreb,
-                        aquaVitaeTreb,
+                        aquaVitaeBass,
                         24,//22 = 135BPM, 23 = 131.5BPM,
                         1,
                         1,
                         926,
-                        926
+                        104
 };
 
 
