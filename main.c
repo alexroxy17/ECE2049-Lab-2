@@ -10,7 +10,7 @@
 #include "songs.h"
 
 
-typedef enum {WELCOME,MENU,MENUPAGE2,GOTSELECT,DIFFICULTYSELECT,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POST} eState;
+typedef enum {WELCOME,MENU,MENUPAGE2,MENUPAGE3,GOTSELECT,DIFFICULTYSELECT,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POST} eState;
 
 
 // Function Prototypes
@@ -42,6 +42,7 @@ __interrupt void TimerA2_ISR(void)
 #define DESPAC 4
 #define MHYSAS 5
 #define AQUAVI 6
+#define CANOND 7
 
 /******************************MAIN FUNCTION*******************************/
 void main(void)
@@ -57,7 +58,7 @@ void main(void)
     eState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
     unsigned char song = 0;
-    const Song songList[7] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa, aquaVitae};
+    const Song songList[8] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa, aquaVitae, canonInD};
     const Song effectList[2] = {lossTone, winTone};
 
     // Using msp430.h definitions
@@ -150,8 +151,8 @@ void main(void)
             Graphics_drawStringCentered(&g_sContext, "1:Interstellar", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "2:Despacito", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "3:Aqua Vitae", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);
-            Graphics_drawStringCentered(&g_sContext, "Press * for", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
-            Graphics_drawStringCentered(&g_sContext, "previous page", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "* for previous", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "# for next pg.", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);  //Draw to display
 
             volatile unsigned int moveOn = 0;   //Wait flag
@@ -167,6 +168,34 @@ void main(void)
                     song = AQUAVI,state = DIFFICULTYSELECT,moveOn = 1;
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     state = MENU,moveOn = 1;
+                if(currKey == '#')  //Query for star key, WAIT FOR INPUT
+                    state = MENUPAGE3,moveOn = 1;
+            }
+            break;
+        }
+
+        case MENUPAGE3:
+        {
+            resetGlobals();
+            Graphics_clearDisplay(&g_sContext); // Clear the display
+            Graphics_drawRectangle(&g_sContext, &box);
+            Graphics_drawStringCentered(&g_sContext, "MENU: Choose a", AUTO_STRING_LENGTH, 48, 10, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "song with 1-3", AUTO_STRING_LENGTH, 48, 20, TRANSPARENT_TEXT);
+
+            Graphics_drawStringCentered(&g_sContext, "1:Canon in D", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "Press * for", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "next page", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
+            Graphics_flushBuffer(&g_sContext);  //Draw to display
+
+            volatile unsigned int moveOn = 0;   //Wait flag
+            char currKey;                       //Holds current key
+            while(moveOn == 0)
+            {
+                currKey = getKey();
+                if(currKey == '1')  //Query for 1 key, WAIT FOR INPUT
+                    song = CANOND,state = DIFFICULTYSELECT,moveOn = 1;
+                if(currKey == '*')  //Query for star key, WAIT FOR INPUT
+                    state = MENUPAGE2,moveOn = 1;
             }
             break;
         }
@@ -255,7 +284,7 @@ void main(void)
                 Graphics_drawStringCentered(&g_sContext, readyText, AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
                 Graphics_drawStringCentered(&g_sContext, countdown[i], AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
                 Graphics_flushBuffer(&g_sContext);
-                BuzzerOnFreq(NOTE_C6);
+                BuzzerOnFreq(C5);
                 userLEDs(3-i);
                 swDelay(1);
                 BuzzerOff();

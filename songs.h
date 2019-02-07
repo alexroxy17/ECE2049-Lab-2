@@ -12,13 +12,13 @@
 #include "mhysa.h"
 #include "notes.h"
 #include "gravityfalls.h"
-#include "takemehome.h"
 #include "tetris.h"
 #include "interstellar.h"
 #include "despacito.h"
 #include "miscSounds.h"
 #include "got.h"
 #include "aquaVitae.h"
+#include "canon.h"
 
 typedef struct {
     const Note* bigSpeaker;                   //What notepattern to play on the large speaker
@@ -117,6 +117,16 @@ const Song aquaVitae = {
                         1,
                         926,
                         104
+};
+
+const Song canonInD = {
+                       canonTreb,
+                       canonBass,
+                       30,
+                       1,
+                       1,
+                       710,
+                       803
 };
 
 
