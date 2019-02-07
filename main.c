@@ -317,10 +317,7 @@ void main(void)
 
         case PLAY:
         {
-
-
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
-
 
             //If rest, don't play any music
             if((&songList[song].bigSpeaker[noteOne].pitch == REST) | (noteOne >= songList[song].bigSpeakerCount)) //If note is a rest or song is done
