@@ -8,17 +8,18 @@
 #ifndef SONGS_H_
 #define SONGS_H_
 
-
-#include "mhysa.h"
 #include "notes.h"
-#include "gravityfalls.h"
-#include "tetris.h"
-#include "interstellar.h"
-#include "despacito.h"
-#include "miscSounds.h"
-#include "got.h"
-#include "aquaVitae.h"
-#include "canon.h"
+
+#include "songs/mhysa.h"
+#include "songs/gravityfalls.h"
+#include "songs/tetris.h"
+#include "songs/interstellar.h"
+#include "songs/despacito.h"
+#include "songs/got.h"
+#include "songs/aquaVitae.h"
+#include "songs/canon.h"
+
+#include "songs/miscSounds.h" //Sound effects
 
 typedef struct {
     const Note* speakerOne;                   //What notepattern to play on the large speaker

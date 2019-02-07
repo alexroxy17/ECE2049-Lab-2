@@ -245,9 +245,6 @@ void speakerTwoOff(void)
     TB0CCTL5 = 0;
 }
 
-
-
-
 void configKeypad(void)
 {
     // Configure digital IO for keypad
