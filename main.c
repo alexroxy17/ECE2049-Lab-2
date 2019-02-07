@@ -151,7 +151,7 @@ void main(void)
             Graphics_drawStringCentered(&g_sContext, "1:Interstellar", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "2:Despacito", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "3:Aqua Vitae", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);
-            Graphics_drawStringCentered(&g_sContext, "* for previous", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "* for pre. pg.", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "# for next pg.", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);  //Draw to display
 
