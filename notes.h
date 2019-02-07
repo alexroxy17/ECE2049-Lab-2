@@ -24,7 +24,7 @@ typedef struct {
 #define FULL   32
 
 //Note Pitches: These are indices to a master notelist.
-#define REST     0
+#define REST 0
 #define E1  1
 #define F1  2
 #define G1  3

@@ -46,7 +46,7 @@ __interrupt void TimerA2_ISR(void)
 
 /******************************MAIN FUNCTION*******************************/
 void main(void)
-{
+ {
     WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer. Always need to stop this!!
                                  // You can then configure it properly, if desired
 
@@ -345,7 +345,7 @@ void main(void)
                 correctButtonPress = 1;
 
             //If rest, don't play any music
-            if((&songList[song].bigSpeaker[noteOne] == REST) | (noteOne >= songList[song].bigSpeakerCount)) //If note is a rest or song is done
+            if((&songList[song].bigSpeaker[noteOne].pitch == REST) | (noteOne >= songList[song].bigSpeakerCount)) //If note is a rest or song is done
                 BuzzerOffTwo();
             else
                 playNoteTwo(&songList[song].bigSpeaker[noteOne]); //Else, play appropriate note with appropriate power
