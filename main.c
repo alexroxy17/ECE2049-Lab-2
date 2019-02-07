@@ -320,29 +320,7 @@ void main(void)
 
 
             volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
-            char correctLED  = ((songList[song].smlSpeaker[noteTwo].pitch % 4)+1);  //(Note index%4)+1 is the value of what button the player should press
-            switch(correctLED)
-            {
-            case 1:
-                correctLED = BIT0;
-                break;
-            case 2:
-                correctLED = BIT1;
-                break;
-            case 3:
-                correctLED = BIT2;
-                break;
-            case 4:
-                correctLED = BIT3;
-                break;
-            }
 
-
-            char currButton = getButtons();
-            if(songList[song].smlSpeaker[noteTwo].pitch == REST)
-                correctLED = 0;
-            if(correctLED & currButton)
-                correctButtonPress = 1;
 
             //If rest, don't play any music
             if((&songList[song].bigSpeaker[noteOne].pitch == REST) | (noteOne >= songList[song].bigSpeakerCount)) //If note is a rest or song is done
@@ -395,13 +373,31 @@ void main(void)
             if(getKey() == '#')         //Quit game if necessary
                 state = QUIT;
 
-            if((demo != 1) && (totalWrongNotes >= 2))   //End game if player loses
+            //**********Button/Game Logic**********//
+
+            char correctLED  = ((songList[song].smlSpeaker[noteTwo].pitch % 4)+1);  //(Note index%4)+1 is the value of what button the player should press
+            switch(correctLED) //Determine what the correct LED for the current playing note is
             {
-                state = LOSE;
+            case 1:
+                correctLED = BIT0;
+                break;
+            case 2:
+                correctLED = BIT1;
+                break;
+            case 3:
+                correctLED = BIT2;
+                break;
+            case 4:
+                correctLED = BIT3;
                 break;
             }
-
-
+            if(songList[song].smlSpeaker[noteTwo].pitch == REST) //If rest, the correct note to play is nothing
+                correctLED = 0;
+            char currButton = getButtons(); //Get the button the player is currently pressing
+            if(correctLED & currButton)
+                correctButtonPress = 1;     //If player presses correct button in the duration of the note, this will toggle on.
+            if((demo != 1) && (totalWrongNotes >= 15))   //End game if player loses
+                state = LOSE;
             break;
         }
 
