@@ -130,9 +130,9 @@ void main(void)
             Graphics_drawStringCentered(&g_sContext, "Press # to", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "continue", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);                                                                      //Refreshing screen
-
+            runTimer();
             swDelay(1);
-
+            stopTimer();
             volatile unsigned int moveOn = 0;   //Wait flag
             char currKey;                       //Holds current key
             while(moveOn == 0)
@@ -457,12 +457,13 @@ void main(void)
             if(correctLED & currButton)
                 correctButtonPress = 1;     //If player presses correct button in the duration of the note, this will toggle on.
 
+            /*
             if(!demo)   //Only count missed presses if the game is not in a demo.
             {
                 if(currButton != correctLED)
                     totalWrongNotes++;
             }
-
+*/
 
 
             if((demo != 1) && (totalWrongNotes >= 15))   //End game if player loses
@@ -478,13 +479,12 @@ void main(void)
             speakerOneOff();   //Reset buzzers
             setLeds(REST);     //Reset LEDs
             resetGlobals();    //Reset globals
-            stopTimer();       //Stop  timer
             Graphics_drawStringCentered(&g_sContext, "GAME", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "OVER", AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "To return:", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "Press *", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);
-
+            /*
             volatile unsigned int moveOn = 0;
             while(moveOn == 0)
             {
@@ -492,6 +492,7 @@ void main(void)
                 if(currKey == '*')    //Wait for user to press * key
                     moveOn = 1;
             }
+            */
             soundEffect = 0;    //Losing sound effect
             state = POST;
             break;
@@ -535,7 +536,7 @@ void main(void)
         {
 
             totalDifficulty = 18;
-            if(dev_enableCountdown)
+            if(dev_enableTones)
             {
                 volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
     
@@ -580,8 +581,8 @@ void main(void)
                 }
             }
 
-            //if(noteOne >= effectList[soundEffect].speakerOneCount)   //If song is over
-           // {
+            if((noteOne >= effectList[soundEffect].speakerOneCount) | dev_enableTones != 1)   //If song is over
+            {
                 volatile unsigned int moveOn = 0;
                 while(moveOn == 0)
                 {
@@ -594,8 +595,8 @@ void main(void)
                 state = WELCOME;
                 stopTimer();    //Stop  timer
                 break;
-            //}
-            //break;
+            }
+            break;
 
         }//End post
 
@@ -607,10 +608,13 @@ void main(void)
 void playNoteSpeakerTwo(const Note* note, char toggle)
 {
     speakerTwoOnFreq(note->pitch);
-    if((note->pitch)!=REST)
-        setLeds(((note->pitch)%4)+1); //If current note isn't a rest, then display LEDs.
-    else
-        setLeds(0);                   //Else, ensure that LEDs are blank.
+    if(toggle)
+    {
+        if((note->pitch)!=REST)
+            setLeds(((note->pitch)%4)+1); //If current note isn't a rest, then display LEDs.
+        else
+            setLeds(0);                   //Else, ensure that LEDs are blank.
+    }
 }
 
 void playNoteSpeakerOne(const Note* note)
@@ -632,6 +636,8 @@ void resetGlobals(void)
     totalWrongNotes = 0;
     //demo = 0;
     postGameLEDtracker = 4;
+    dev_enableTones = 1;
+    dev_enableCountdown = 1;
 }
 
 void swDelay(char waitTime)
