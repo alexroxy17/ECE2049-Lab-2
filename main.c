@@ -9,7 +9,7 @@
 #include "peripherals.h"
 #include "songs.h"
 
-
+//hi, this is rosana
 typedef enum {WELCOME,DEV,MENU,MENUPAGE2,MENUPAGE3,GOTSELECT,DIFFICULTYSELECT,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POST} gameState; //State machine states
 
 
