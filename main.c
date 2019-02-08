@@ -15,12 +15,22 @@ typedef enum {WELCOME,DEV,MENU,MENUPAGE2,MENUPAGE3,GOTSELECT,DIFFICULTYSELECT,CO
 
 // Function Prototypes
 void swDelay(char waitTime);
-void playNote(const Note* note, char ledToggle);
-void playNoteTwo(const Note* note);
+void playNoteSpeakerTwo(const Note* note, char ledToggle);
+void playNoteSpeakerOne(const Note* note);
 void resetGlobals(void);
 
-volatile unsigned int totalDifficulty = 1;
-volatile unsigned int count=0, sixteenths=0, thirtySeconds=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0, wrongNotes = 0, totalWrongNotes=0, difficulty = 1, demo = 0;
+volatile unsigned int totalDifficulty = 1;      //Total difficulty multiplier
+volatile unsigned int difficulty = 1;           //Player selected difficulty
+volatile unsigned int count=0;                  //Interrupt counter
+volatile unsigned int sixteenths=0;             //Sixteenths counter
+volatile unsigned int noteOne=0;                //Current note being played on speaker 1
+volatile unsigned int noteTwo=0;                //Current note being played on speaker 2
+volatile unsigned int durationOne;              //Duration of note being played on speaker 1
+volatile unsigned int durationTwo;              //Duration of note being played on speaker 2
+volatile unsigned int sixteenthsPassed=0;       //How many sixteenths have passed since note has started playing on speaker 1
+volatile unsigned int sixteenthsPassedTwo=0;    //How many sixteenths have passed since note has started playing on speaker 2
+volatile unsigned int totalWrongNotes=0;        //Total number of missed button presses
+volatile unsigned int demo = 0;
 
 char tempo = 18, foo=4, soundEffect = 0;    //init tempo to 165 bpm, foo to 4
 char correctButtonPress = 0;
@@ -94,12 +104,11 @@ void main(void)
             {
                 currKey = getKey();
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
-                    moveOn = 1;
+                    moveOn = 1, state = MENU;
                 if(currKey == '#')
                     moveOn = 1, state = DEV;
                 //pressButtons();
             }
-            state = MENU;
 
             break;
         }
@@ -125,7 +134,7 @@ void main(void)
                     dev_enableTones = 0;
                 if(currKey == '2')  //Query for 2 key, WAIT FOR INPUT
                     dev_enableCountdown = 0;
-                if(currKey == '#')
+                if(currKey == '*')
                     moveOn = 1, state = MENU;
                 //pressButtons();
             }
@@ -138,7 +147,7 @@ void main(void)
             resetGlobals();
             Graphics_clearDisplay(&g_sContext); // Clear the display
             Graphics_drawRectangle(&g_sContext, &box);
-            Graphics_drawStringCentered(&g_sContext, "MENUU: Choose a", AUTO_STRING_LENGTH, 48, 10, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "MENU: Choose a", AUTO_STRING_LENGTH, 48, 10, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "song with 1-3", AUTO_STRING_LENGTH, 48, 20, TRANSPARENT_TEXT);
 
             Graphics_drawStringCentered(&g_sContext, "1:Grav. Falls", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
@@ -318,30 +327,34 @@ void main(void)
 
         case COUNTDOWN: //Countdown from 3 to 1, with ~1 second interval
         {
-            uint8_t* readyText = "Get ready!";         //Using this to avoid CCS complaining at me
-            uint8_t* countdown[3] = {"3", "2", "1"};   //Using this to have a loop instead of three seperate write blocks
-            runTimer();
-            volatile unsigned int i;
-            for(i=0;i<3;i++)
+            if(dev_enableCountdown)
             {
-                Graphics_clearDisplay(&g_sContext); // Clear the display
-                Graphics_drawStringCentered(&g_sContext, readyText, AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
-                Graphics_drawStringCentered(&g_sContext, countdown[i], AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
-                Graphics_flushBuffer(&g_sContext);
-                speakerTwoOnFreq(C5);
-                userLEDs(3-i);
-                swDelay(1);
-                speakerTwoOff();
-                swDelay(1);
+            
+                uint8_t* readyText = "Get ready!";         //Using this to avoid CCS complaining at me
+                uint8_t* countdown[3] = {"3", "2", "1"};   //Using this to have a loop instead of three seperate write blocks
+                runTimer();
+                volatile unsigned int i;
+                for(i=0;i<3;i++)
+                {
+                    Graphics_clearDisplay(&g_sContext); // Clear the display
+                    Graphics_drawStringCentered(&g_sContext, readyText, AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
+                    Graphics_drawStringCentered(&g_sContext, countdown[i], AUTO_STRING_LENGTH, 48, 25, TRANSPARENT_TEXT);
+                    Graphics_flushBuffer(&g_sContext);
+                    speakerTwoOnFreq(C5);
+                    userLEDs(3-i);
+                    swDelay(1);
+                    speakerTwoOff();
+                    swDelay(1);
+                }
             }
+            
             Graphics_clearDisplay(&g_sContext);
             userLEDs(3);
             Graphics_drawStringCentered(&g_sContext, "GO!", AUTO_STRING_LENGTH, 48, 15, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "Press # to", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "quit", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);
-
-
+            
             //resetGlobals();
             if(songList[song].power)
                 P1DS |=  BIT2;              //High drive strength - use for more stronger SpeakerOne audio.
@@ -375,12 +388,12 @@ void main(void)
             if((&songList[song].speakerOne[noteOne].pitch == REST) | (noteOne >= songList[song].speakerOneCount)) //If note is a rest or song is done
                 speakerOneOff();
             else
-                playNoteTwo(&songList[song].speakerOne[noteOne]); //Else, play appropriate note with appropriate power
+                playNoteSpeakerOne(&songList[song].speakerOne[noteOne]); //Else, play appropriate note with appropriate power
 
             if((&songList[song].speakerTwo[noteTwo] == REST) | (noteTwo >= songList[song].speakerTwoCount)) //If note is a rest or song is done
                 speakerTwoOff();
             else
-                playNote   (&songList[song].speakerTwo[noteTwo],1);
+                playNoteSpeakerTwo   (&songList[song].speakerTwo[noteTwo],1);
 
             durationOne = songList[song].speakerOne[noteOne].duration; //Set note durations
             durationTwo = songList[song].speakerTwo[noteTwo].duration;
@@ -515,50 +528,52 @@ void main(void)
         {
 
             totalDifficulty = 18;
-            /*
-            volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
-
-            //If rest, don't play any music
-            if((&effectList[soundEffect].bigSpeaker[noteOne] == REST) | (noteOne >= effectList[soundEffect].bigSpeakerCount)) //If note is a rest or song is done
-                BuzzerOffTwo();
-            else
-                playNoteTwo(&effectList[soundEffect].bigSpeaker[noteOne]); //Else, play appropriate note with appropriate power
-
-            if((&effectList[soundEffect].smlSpeaker[noteTwo] == REST) | (noteTwo >= effectList[soundEffect].smlSpeakerCount)) //If note is a rest or song is done
-                BuzzerOff();
-            else
-                playNote   (&effectList[soundEffect].smlSpeaker[noteTwo],0);
-
-            durationOne = effectList[soundEffect].bigSpeaker[noteOne].duration;
-            durationTwo = effectList[soundEffect].smlSpeaker[noteTwo].duration;
-
-            if(loc_sixteenths - sixteenthsPassed == durationOne)
+            if(dev_enableCountdown)
             {
-                noteOne++;
-                sixteenthsPassed = loc_sixteenths;
-                BuzzerOffTwo();
-                setLeds(foo);
-                if(soundEffect)
-                {
-                    foo++;  //Ascending lights
-                    if(foo >= 4)
-                        foo = 1;
-                }
+                volatile unsigned int loc_sixteenths = sixteenths, loc_sixteenths_two = sixteenths; //sixteenths arises from the global interrupts
+    
+                //If rest, don't play any music
+                if((&effectList[soundEffect].speakerOne[noteOne] == REST) | (noteOne >= effectList[soundEffect].speakerOneCount)) //If note is a rest or song is done
+                    speakerOneOff();
                 else
+                    playNoteSpeakerOne(&effectList[soundEffect].speakerOne[noteOne]); //Else, play appropriate note with appropriate power
+    
+                if((&effectList[soundEffect].speakerTwo[noteTwo].pitch == REST) | (noteTwo >= effectList[soundEffect].speakerTwoCount)) //If note is a rest or song is done
+                    speakerTwoOff();
+                else
+                    playNoteSpeakerTwo(&effectList[soundEffect].speakerTwo[noteTwo],0);
+    
+                durationOne = effectList[soundEffect].speakerOne[noteOne].duration;
+                durationTwo = effectList[soundEffect].speakerTwo[noteTwo].duration;
+    
+                if(loc_sixteenths - sixteenthsPassed == durationOne)
                 {
-                    foo--;  //Descending lights
-                    if(foo <= 0)
-                        foo = 4;
+                    noteOne++;
+                    sixteenthsPassed = loc_sixteenths;
+                    speakerOneOff();
+                    setLeds(foo);
+                    if(soundEffect)
+                    {
+                        foo++;  //Ascending lights
+                        if(foo >= 4)
+                            foo = 1;
+                    }
+                    else
+                    {
+                        foo--;  //Descending lights
+                        if(foo <= 0)
+                            foo = 4;
+                    }
+                }
+                if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
+                {
+                    noteTwo++;
+                    sixteenthsPassedTwo = loc_sixteenths_two;
+                    speakerTwoOff();
                 }
             }
-            if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
-            {
-                noteTwo++;
-                sixteenthsPassedTwo = loc_sixteenths_two;
-                BuzzerOff();
-            }
-            */
-            //if(noteOne >= effectList[soundEffect].bigSpeakerCount)   //If song is over
+
+            //if(noteOne >= effectList[soundEffect].speakerOneCount)   //If song is over
            // {
                 volatile unsigned int moveOn = 0;
                 while(moveOn == 0)
@@ -581,7 +596,7 @@ void main(void)
 }//End main
 
 
-void playNote(const Note* note, char toggle)
+void playNoteSpeakerTwo(const Note* note, char toggle)
 {
     speakerTwoOnFreq(note->pitch);
     if((note->pitch)!=REST)
@@ -590,7 +605,7 @@ void playNote(const Note* note, char toggle)
         setLeds(0);                   //Else, ensure that LEDs are blank.
 }
 
-void playNoteTwo(const Note* note)
+void playNoteSpeakerOne(const Note* note)
 {
     speakerOneOnFreq(note->pitch);
 }
