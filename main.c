@@ -19,20 +19,25 @@ void playNote(const Note* note, char ledToggle);
 void playNoteTwo(const Note* note);
 void resetGlobals(void);
 
-volatile unsigned int totalDifficulty = 1;
-volatile unsigned int count=0, sixteenths=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0, wrongNotes = 0, totalWrongNotes=0, difficulty = 1, demo = 0;
+volatile unsigned int totalDifficultyLegacy = 1, totalDifficulty = 1;
+volatile unsigned int count=0, sixteenths=0, thirtySeconds=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0, wrongNotes = 0, totalWrongNotes=0, difficulty = 1, demo = 0;
+
 char tempo = 18, foo=4, soundEffect = 0;    //init tempo to 165 bpm, foo to 4
 char correctButtonPress = 0;
 char wrongButtonBress = 0;
 char dev_enableTones = 1;     //Dev: enable winning/losing tones
 char dev_enableCountdown = 1; //Dev: enable countdown waiting
+char legacy = 1; //Use sixteenth note base system
 
 #pragma vector=TIMER2_A0_VECTOR
 __interrupt void TimerA2_ISR(void)
 {
     count++;
-    if (count % totalDifficulty == 0) //18=165 bpm, 30 = 100bpm
+
+    if (legacy && (count % totalDifficultyLegacy == 0)) //18=165 bpm, 30 = 100bpm
         sixteenths++;
+    else if(count % totalDifficulty == 0)
+        thirtySeconds++;
 }
 
 #define GFALLS 0
@@ -43,6 +48,8 @@ __interrupt void TimerA2_ISR(void)
 #define MHYSAS 5
 #define AQUAVI 6
 #define CANOND 7
+#define SNGSTR 8
+#define DAVYJO 9
 
 /******************************MAIN FUNCTION*******************************/
 void main(void)
@@ -58,7 +65,7 @@ void main(void)
     eState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
     unsigned char song = 0;
-    const Song songList[8] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa, aquaVitae, canonInD};
+    const Song songList[9] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa, aquaVitae, canonInD, songOfStorms};
     const Song effectList[2] = {lossTone, winTone};
 
     // Using msp430.h definitions
@@ -90,7 +97,7 @@ void main(void)
                 currKey = getKey();
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     moveOn = 1;
-                if(currKey == "#")
+                if(currKey == '#')
                     moveOn = 1, state = DEV;
                 //pressButtons();
             }
@@ -118,7 +125,7 @@ void main(void)
                     dev_enableTones = 0;
                 if(currKey == '2')  //Query for 2 key, WAIT FOR INPUT
                     dev_enableCountdown = 0;
-                if(currKey == "#")
+                if(currKey == '#')
                     moveOn = 1, state = MENU;
                 //pressButtons();
             }
@@ -198,7 +205,7 @@ void main(void)
                     song = AQUAVI,state = DIFFICULTYSELECT,moveOn = 1;
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     state = MENU,moveOn = 1;
-                if(currKey == '#')  //Query for star key, WAIT FOR INPUT
+                if(currKey == '#')  //Query for pound key, WAIT FOR INPUT
                     state = MENUPAGE3,moveOn = 1;
             }
             break;
@@ -213,6 +220,8 @@ void main(void)
             Graphics_drawStringCentered(&g_sContext, "song with 1-3", AUTO_STRING_LENGTH, 48, 20, TRANSPARENT_TEXT);
 
             Graphics_drawStringCentered(&g_sContext, "1:Canon in D", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "2:Sng Of Strms", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "2:Davy Jones", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "Press * for", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "next page", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);  //Draw to display
@@ -224,6 +233,10 @@ void main(void)
                 currKey = getKey();
                 if(currKey == '1')  //Query for 1 key, WAIT FOR INPUT
                     song = CANOND,state = DIFFICULTYSELECT,moveOn = 1;
+                if(currKey == '2')  //Query for 2 key, WAIT FOR INPUT
+                    song = SNGSTR,state = DIFFICULTYSELECT,moveOn = 1;
+                if(currKey = '3')
+                    song = DAVYJO,state = DIFFICULTYSELECT,legacy = 0,moveOn = 1;
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     state = MENUPAGE2,moveOn = 1;
             }
@@ -275,6 +288,7 @@ void main(void)
 
             volatile unsigned int moveOn = 0;   //Wait flag
             char currKey;                       //Holds current key
+
             while(moveOn == 0)
             {
                 currKey = getKey();
@@ -335,7 +349,10 @@ void main(void)
                 P1DS &= ~BIT2;              //Low drive strength - use for more balanced audio or if using piezo speaker for SpeakerOne
 
             tempo = songList[song].tempo;           //Set correct song tempo
-            totalDifficulty = (tempo*difficulty);   //Scale tempo to difficulty
+            if(!legacy)
+                tempo /= 2;                         //If using 32nd time base, effectivly double tempo.
+
+            totalDifficultyLegacy = (tempo*difficulty);   //Scale tempo to difficulty
             state = PLAY;   //Advance to next state
             userLEDs(0);    //Blank out LEDs
             stopTimer();    //
@@ -349,7 +366,6 @@ void main(void)
         {
             volatile unsigned int instSixteenthsOne = sixteenths, instSixteenthsTwo = sixteenths; //sixteenths arises from the global interrupts.
                                                                                                   //Capture this and ensure it doesn't change during loop execution
-
             //If rest, don't play any music
             if((&songList[song].speakerOne[noteOne].pitch == REST) | (noteOne >= songList[song].speakerOneCount)) //If note is a rest or song is done
                 speakerOneOff();

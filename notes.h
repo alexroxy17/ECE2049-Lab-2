@@ -16,12 +16,12 @@ typedef struct {
 
 
 //Note Lengths
-#define THSCND 1
-#define SXTNTH 2
-#define EIGHTH 4
-#define FOURTH 8
-#define HALF   16
-#define FULL   32
+#define TS 1
+#define SI 2
+#define EI 4
+#define FO 8
+#define HA 16
+#define FU 32
 
 //Note Pitches: These are indices to a master notelist.
 #define REST 0
@@ -40,7 +40,9 @@ typedef struct {
 #define Gs2 13
 #define A2  14
 #define As2 15
+#define Bb2 15
 #define B2  16
+#define Bs2 17
 #define C3  17
 #define Cs3 18
 #define D3  19
@@ -53,23 +55,30 @@ typedef struct {
 #define Gs3 26
 #define A3  27
 #define As3 28
+#define Bb3 28
 #define B3  29
 #define Bs3 30
+#define Cb4 30
 #define C4  31
 #define Cs4 32
 #define Db4 33
 #define D4  34
 #define Ds4 35
+#define Eb4 35
 #define E4  36
 #define F4  37
 #define Fs4 38
+#define Gb4 38
 #define G4  39
 #define Gs4 40
+#define Ab4 40
 #define A4  41
 #define Bb4 42
 #define B4  43
+#define Cb5 43
 #define C5  44
 #define Cs5 45
+#define Db5 45
 #define D5  46
 #define Ds5 47
 #define Eb5 48
@@ -78,20 +87,25 @@ typedef struct {
 #define Fs5 51
 #define G5  52
 #define Gs5 53
-#define Ab  54
+#define Ab5 54
 #define A5  55
 #define As5 56
 #define Bb5 57
 #define B5  58
 #define C6  59
 #define Cs6 60
+#define Db6 60
 #define D6  61
 #define Ds6 62
+#define Eb6 62
 #define E6  63
+#define Fb6 63
 #define F6  64
 #define Fs6 65
+#define Gb6 65
 #define G6  66
 #define Gs6 67
+#define Ab6 67
 #define A6  68
 #define As6 69
 #define B6  70

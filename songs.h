@@ -18,6 +18,8 @@
 #include "songs/got.h"
 #include "songs/aquaVitae.h"
 #include "songs/canon.h"
+#include "songs/songofstorms.h"
+#include "songs/davyjones.h"
 
 #include "songs/miscSounds.h" //Sound effects
 
@@ -130,5 +132,22 @@ const Song canonInD = {
                        803
 };
 
+const Song songOfStorms = {
+
+                           stormsTreb,
+                           stormsBass,
+                           16, //Goal: 180,
+                           0,
+                           1,
+                           302,
+                           230
+
+};
+
+const Song davyJonesTheme = {
+                             jonesTreb,
+                             jonesBass,
+
+};
 
 #endif /* SONGS_H_ */
