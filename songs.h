@@ -118,8 +118,8 @@ const Song aquaVitae = {
                         24,//Use 24
                         1,
                         1,
-                        926,
-                        104
+                        908,
+                        99
 };
 
 const Song canonInD = {

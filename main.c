@@ -51,7 +51,6 @@ char dev_enableCountdown = 1; //Dev: enable countdown waiting
 __interrupt void TimerA2_ISR(void)
 {
     count++;
-
     if (count % totalDifficulty == 0) //18=165 bpm, 30 = 100bpm
         sixteenths++; //If legacy is 0, this is 32nds!
 }
@@ -115,7 +114,6 @@ void main(void)
                     moveOn = 1, state = MENU;
                 if(currKey == '#')
                     moveOn = 1, state = DEV;
-                //pressButtons();
             }
 
             break;
@@ -237,7 +235,7 @@ void main(void)
 
             Graphics_drawStringCentered(&g_sContext, "1:Canon in D", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "2:Sng Of Strms", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
-            Graphics_drawStringCentered(&g_sContext, "3:Davy Jones", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);
+            //Graphics_drawStringCentered(&g_sContext, "3:Davy Jones", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);  //Disabled for presentation to Prof Jarvis
             Graphics_drawStringCentered(&g_sContext, "Press * for", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "next page", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);  //Draw to display
@@ -251,8 +249,8 @@ void main(void)
                     song = CANOND,state = DIFFICULTYSELECT,moveOn = 1;
                 if(currKey == '2')  //Query for 2 key, WAIT FOR INPUT
                     song = SNGSTR,state = DIFFICULTYSELECT,moveOn = 1;
-                if(currKey == '3')
-                    song = DAVYJO,state = DIFFICULTYSELECT,legacy = 0,moveOn = 1;
+                //if(currKey == '3')                                                            //Disabled for presentation to Prof Jarvis
+                //    song = DAVYJO,state = DIFFICULTYSELECT,legacy = 0,moveOn = 1;
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     state = MENUPAGE2,moveOn = 1;
             }
