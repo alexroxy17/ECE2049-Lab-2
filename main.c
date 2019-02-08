@@ -19,7 +19,7 @@ void playNote(const Note* note, char ledToggle);
 void playNoteTwo(const Note* note);
 void resetGlobals(void);
 
-volatile unsigned int totalDifficultyLegacy = 1, totalDifficulty = 1;
+volatile unsigned int totalDifficulty = 1;
 volatile unsigned int count=0, sixteenths=0, thirtySeconds=0,noteOne=0,noteTwo=0,durationOne,durationTwo,sixteenthsPassed=0, sixteenthsPassedTwo=0, wrongNotes = 0, totalWrongNotes=0, difficulty = 1, demo = 0;
 
 char tempo = 18, foo=4, soundEffect = 0;    //init tempo to 165 bpm, foo to 4
@@ -34,10 +34,8 @@ __interrupt void TimerA2_ISR(void)
 {
     count++;
 
-    if (legacy && (count % totalDifficultyLegacy == 0)) //18=165 bpm, 30 = 100bpm
+    if (count % totalDifficulty == 0) //18=165 bpm, 30 = 100bpm
         sixteenths++;
-    else if(count % totalDifficulty == 0)
-        thirtySeconds++;
 }
 
 #define GFALLS 0
@@ -65,7 +63,7 @@ void main(void)
     eState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
     unsigned char song = 0;
-    const Song songList[9] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa, aquaVitae, canonInD, songOfStorms};
+    const Song songList[10] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa, aquaVitae, canonInD, songOfStorms, davyJonesTheme};
     const Song effectList[2] = {lossTone, winTone};
 
     // Using msp430.h definitions
@@ -114,7 +112,9 @@ void main(void)
             Graphics_drawStringCentered(&g_sContext, "2:Dis. cntdn", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "Press # to", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "continue", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
-            Graphics_flushBuffer(&g_sContext);                                                                         //Refreshing screen
+            Graphics_flushBuffer(&g_sContext);                                                                      //Refreshing screen
+
+            swDelay(1);
 
             volatile unsigned int moveOn = 0;   //Wait flag
             char currKey;                       //Holds current key
@@ -221,7 +221,7 @@ void main(void)
 
             Graphics_drawStringCentered(&g_sContext, "1:Canon in D", AUTO_STRING_LENGTH, 48, 40, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "2:Sng Of Strms", AUTO_STRING_LENGTH, 48, 50, TRANSPARENT_TEXT);
-            Graphics_drawStringCentered(&g_sContext, "2:Davy Jones", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);
+            Graphics_drawStringCentered(&g_sContext, "3:Davy Jones", AUTO_STRING_LENGTH, 48, 60, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "Press * for", AUTO_STRING_LENGTH, 48, 75, TRANSPARENT_TEXT);
             Graphics_drawStringCentered(&g_sContext, "next page", AUTO_STRING_LENGTH, 48, 85, TRANSPARENT_TEXT);
             Graphics_flushBuffer(&g_sContext);  //Draw to display
@@ -235,7 +235,7 @@ void main(void)
                     song = CANOND,state = DIFFICULTYSELECT,moveOn = 1;
                 if(currKey == '2')  //Query for 2 key, WAIT FOR INPUT
                     song = SNGSTR,state = DIFFICULTYSELECT,moveOn = 1;
-                if(currKey = '3')
+                if(currKey == '3')
                     song = DAVYJO,state = DIFFICULTYSELECT,legacy = 0,moveOn = 1;
                 if(currKey == '*')  //Query for star key, WAIT FOR INPUT
                     state = MENUPAGE2,moveOn = 1;
@@ -349,16 +349,21 @@ void main(void)
                 P1DS &= ~BIT2;              //Low drive strength - use for more balanced audio or if using piezo speaker for SpeakerOne
 
             tempo = songList[song].tempo;           //Set correct song tempo
-            if(!legacy)
-                tempo /= 2;                         //If using 32nd time base, effectivly double tempo.
 
-            totalDifficultyLegacy = (tempo*difficulty);   //Scale tempo to difficulty
+
+            totalDifficulty = (tempo*difficulty);   //Scale tempo to difficulty
+
+            legacy = songList[song].legacy;
+            if(legacy == 0)
+                totalDifficulty /= 2;                         //If using 32nd time base, effectivly double tempo.
+
             state = PLAY;   //Advance to next state
             userLEDs(0);    //Blank out LEDs
             stopTimer();    //
             runTimer();     //Restart timer, just in case
             count = 0;      //Reset counter to 0, just in case
             sixteenths = 0; //Reset sixteenths to 0, just in case
+
             break;
         }
 

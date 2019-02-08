@@ -73,10 +73,10 @@ const Song gameOfThrones = {
 };
 
 const Song interstellar = {
-                     interstellarBass,
                      interstellarTreble,
+                     interstellarBass,
                      30,
-                     1,
+                     0, //Low power
                      1,
                      214,
                      546
@@ -147,6 +147,11 @@ const Song songOfStorms = {
 const Song davyJonesTheme = {
                              jonesTreb,
                              jonesBass,
+                             25,
+                             1,
+                             0,
+                             440,
+                             399
 
 };
 
