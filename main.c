@@ -1,5 +1,5 @@
 /*************        ECE2049      *****************/
-/*************         LAB 1       *****************/
+/*************         LAB 2       *****************/
 /***************************************************/
 /************** Nathaniel Bajakian *****************/
 /**************    Rosana Pochat   *****************/
@@ -10,7 +10,7 @@
 #include "songs.h"
 
 
-typedef enum {WELCOME,DEV,MENU,MENUPAGE2,MENUPAGE3,GOTSELECT,DIFFICULTYSELECT,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POST} eState;
+typedef enum {WELCOME,DEV,MENU,MENUPAGE2,MENUPAGE3,GOTSELECT,DIFFICULTYSELECT,COUNTDOWN, PLAY, LOSE, WIN, QUIT, POST} gameState; //State machine states
 
 
 // Function Prototypes
@@ -19,25 +19,33 @@ void playNoteSpeakerTwo(const Note* note, char ledToggle);
 void playNoteSpeakerOne(const Note* note);
 void resetGlobals(void);
 
-volatile unsigned int totalDifficulty = 1;      //Total difficulty multiplier
-volatile unsigned int difficulty = 1;           //Player selected difficulty
-volatile unsigned int count=0;                  //Interrupt counter
-volatile unsigned int sixteenths=0;             //Sixteenths counter
+//PLAYBACK VARIABLES
 volatile unsigned int noteOne=0;                //Current note being played on speaker 1
 volatile unsigned int noteTwo=0;                //Current note being played on speaker 2
 volatile unsigned int durationOne;              //Duration of note being played on speaker 1
 volatile unsigned int durationTwo;              //Duration of note being played on speaker 2
 volatile unsigned int sixteenthsPassed=0;       //How many sixteenths have passed since note has started playing on speaker 1
 volatile unsigned int sixteenthsPassedTwo=0;    //How many sixteenths have passed since note has started playing on speaker 2
-volatile unsigned int totalWrongNotes=0;        //Total number of missed button presses
-volatile unsigned int demo = 0;
 
-char tempo = 18, foo=4, soundEffect = 0;    //init tempo to 165 bpm, foo to 4
-char correctButtonPress = 0;
-char wrongButtonBress = 0;
+//GAME SPEED/TIMING VARIABLES
+volatile unsigned int totalDifficulty = 1;      //Total difficulty multiplier
+volatile unsigned int difficulty = 1;           //Player selected difficulty
+volatile unsigned int count=0;                  //Interrupt counter
+volatile unsigned int sixteenths=0;             //Sixteenths counter
+char tempo = 18;                                //Initialize tempo at 165BPM
+char legacy = 1;                                //Legacy = 1: use sixteenth note base system. Legacy = 0: use 32nd note base system.
+
+
+//GAME STATE VARIABLES
+volatile unsigned int totalWrongNotes=0;        //Total number of missed button presses
+char correctButtonPress = 0;                    //Toggle variable, goes to 1 when correct button is pressed at any point during note playback.
+volatile unsigned int demo = 0;                 //While high, player will not need to continue pressing buttons.
+
+//MISCELLANEOUS VARIABLES
+char postGameLEDtracker=4;
 char dev_enableTones = 1;     //Dev: enable winning/losing tones
 char dev_enableCountdown = 1; //Dev: enable countdown waiting
-char legacy = 1; //Use sixteenth note base system
+
 
 #pragma vector=TIMER2_A0_VECTOR
 __interrupt void TimerA2_ISR(void)
@@ -45,9 +53,10 @@ __interrupt void TimerA2_ISR(void)
     count++;
 
     if (count % totalDifficulty == 0) //18=165 bpm, 30 = 100bpm
-        sixteenths++;
+        sixteenths++; //If legacy is 0, this is 32nds!
 }
 
+//Macros: Index of each song, stored in songs[]
 #define GFALLS 0
 #define TETRIS 1
 #define GOTBAS 2
@@ -64,20 +73,19 @@ void main(void)
  {
     WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer. Always need to stop this!!
                                  // You can then configure it properly, if desired
+    // Using msp430.h definitions
+     _BIS_SR(GIE); // Global Interrupt enable VERY IMPORTANT
 
     //Initialization
     initLeds();       //Initialize LEDs
     configDisplay();  //Configure 96x96 display
     configKeypad();   //Configure keypad
     initButtons();    //Configure buttons
-    eState state = WELCOME; //Set initial state to welcome
+    gameState state = WELCOME; //Set initial state to welcome
     Graphics_Rectangle box = {.xMin = 2, .xMax = 94, .yMin = 2, .yMax = 94 };     // Draw a box around everything because it looks nice
-    unsigned char song = 0;
+    unsigned char song = 0, soundEffect = 0;
     const Song songList[10] = {gravityFalls, tetris, gameOfThrones, interstellar, despacito, mhysa, aquaVitae, canonInD, songOfStorms, davyJonesTheme};
     const Song effectList[2] = {lossTone, winTone};
-
-    // Using msp430.h definitions
-     _BIS_SR(GIE); // Global Interrupt enable VERY IMPORTANT
 
     /******************************MAIN LOOP*******************************/
     while (1)    // Forever loop
@@ -136,7 +144,6 @@ void main(void)
                     dev_enableCountdown = 0;
                 if(currKey == '*')
                     moveOn = 1, state = MENU;
-                //pressButtons();
             }
             state = MENU;
 
@@ -551,18 +558,18 @@ void main(void)
                     noteOne++;
                     sixteenthsPassed = loc_sixteenths;
                     speakerOneOff();
-                    setLeds(foo);
+                    setLeds(postGameLEDtracker);
                     if(soundEffect)
                     {
-                        foo++;  //Ascending lights
-                        if(foo >= 4)
-                            foo = 1;
+                        postGameLEDtracker++;  //Ascending lights
+                        if(postGameLEDtracker >= 4)
+                            postGameLEDtracker = 1;
                     }
                     else
                     {
-                        foo--;  //Descending lights
-                        if(foo <= 0)
-                            foo = 4;
+                        postGameLEDtracker--;  //Descending lights
+                        if(postGameLEDtracker <= 0)
+                            postGameLEDtracker = 4;
                     }
                 }
                 if(loc_sixteenths_two - sixteenthsPassedTwo == durationTwo)
@@ -583,6 +590,7 @@ void main(void)
                         moveOn = 1;
                 }
                 resetGlobals();
+                soundEffect = 0;
                 state = WELCOME;
                 stopTimer();    //Stop  timer
                 break;
@@ -623,8 +631,7 @@ void resetGlobals(void)
     durationTwo = 0;
     totalWrongNotes = 0;
     //demo = 0;
-    foo = 4;
-    soundEffect = 0;
+    postGameLEDtracker = 4;
 }
 
 void swDelay(char waitTime)
